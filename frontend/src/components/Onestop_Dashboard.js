@@ -5,10 +5,12 @@ import axios from 'axios';
 export class Onestop_Dashboard extends React.Component {
 
 componentDidMount() {
-  axios
-    .get(`'http://10.211.55.253:3000/utilities/onestop/dashboard'`)
+  axios({
+    method:'get',
+    url:'https://jsonplaceholder.typicode.com/users'
+  })
     .then(res => console.log(res) )
-    .catch(err => console.log(err))
+    .catch(err => console.log(err));
 }
   // axios.get('http://10.211.55.253:3000/utilities/onestop/dashboard')
   //         .then(response => console.log(response) )
