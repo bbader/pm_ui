@@ -61,8 +61,8 @@ export class Navigation extends React.Component {
       return (
         <Navbar style={{ backgroundColor: '#0F0F59' }} >
           <NavbarBrand href="/">  
-            <img src={logo} width="144" height="68" class="d-inline-block align-left" alt="" />
-            <span class="navbar-text" >Performance Manager</span>
+            <img src={logo} width="144" height="68" className="d-inline-block align-left" alt="" />
+            <span className="navbar-text" >Performance Manager</span>
           </NavbarBrand>
           <NavbarToggler onClick={this.toggle} />
         </Navbar>

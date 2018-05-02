@@ -4,8 +4,14 @@ import axios from 'axios';
 
 export class Onestop_Dashboard extends React.Component {
 
-  axios.get('http://10.211.55.253:3000/utilities/onestop/dashboard')
-          .then(response => console.log(response) )
+componentDidMount() {
+  axios
+    .get(`'http://10.211.55.253:3000/utilities/onestop/dashboard'`)
+    .then(res => console.log(res) )
+    .catch(err => console.log(err))
+}
+  // axios.get('http://10.211.55.253:3000/utilities/onestop/dashboard')
+  //         .then(response => console.log(response) )
 
   render() {
     return (
