@@ -149,7 +149,8 @@ export class MyMenu extends React.Component {
                   <button className="dropdown-toggle"> <FontAwesomeIcon icon={faWrench}/> Utilities  </button>
                     <div className="dropdown-menu" aria-labelledby="navbarDropdown">
 
-                      <a className="dropdown-item" href="/">Job Viewer  </a>
+                      <NavLink className="nav-link dropdown-item" to="/Jobviewer">  Job Viewer  </NavLink> 
+
 
                       <li className="nav-item dropdown">
                         <button className="dropdown-toggle">  OneStop  </button>
