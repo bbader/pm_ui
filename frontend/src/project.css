@@ -114,3 +114,117 @@ button {
     border-color: rgba(255, 255, 255, 1);
   } 
   
+/* From reactabular style.css */
+table {
+  color: black;
+  font-size: 0.75em;
+}
+
+table .sort {
+  cursor: pointer;
+  cursor: hand;
+}
+table .sort:after {
+  padding-left: 1em;
+
+  font-size: 0.5em;
+}
+table .sort-none:after {
+  content: "\21D5";
+
+  padding-left: 0.5em;
+  font-size: 1em;
+}
+table .sort-asc:after {
+  content: "\25BC";
+}
+table .sort-desc:after {
+  content: "\25B2";
+}
+
+/* from reactabular main.css */
+.gitter-chat-embed-action-bar {
+  justify-content: flex-start;
+}
+
+.github-corner svg {
+  z-index: 1000;
+}
+
+table {
+  width: 100%;
+}
+
+.controls {
+  overflow: auto;
+}
+.per-page-container {
+  margin: 1em;
+
+  float: left;
+}
+.per-page-container input {
+  margin-left: 1em;
+}
+.scroll-container {
+  margin: 1em;
+
+  float: left;
+}
+.search-container {
+  margin: 1em;
+
+  float: right;
+}
+
+.edit {
+  margin-right: 1em;
+}
+
+.cancel-button {
+  float: right;
+}
+
+.header-input,
+.column-filter-input {
+  float: left;
+  width: 100%;
+}
+
+.highlight {
+  background: rgb(255, 255, 175);
+}
+
+.selected-row td {
+  background: rgb(255, 255, 175) !important; /* XXX */
+}
+
+/* inline-editing.md */
+.edited {
+  border-left: 0.2em solid orange;
+  padding-left: 0.2em;
+}
+
+/* more from reactabular */
+/* .resize-container {
+  table-layout: fixed;
+  display: table;
+  width: 100%;
+}
+
+.resize-value {
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  word-break: break-all;
+  word-wrap: break-word;
+  width: calc(100% - 1px);
+}
+
+.resize-handle {
+  outline: solid 1px black;
+  cursor: col-resize;
+  float: right;
+  width: 0;
+} */

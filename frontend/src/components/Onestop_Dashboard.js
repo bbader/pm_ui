@@ -38,7 +38,7 @@ componentDidMount() {
       this.setState({osInfo: res.data.osInfo});
       this.setState({pmVer: res.data.pm_ver});
       this.setState({upTime: res.data.upTime});
-      console.log(res.data);
+      // console.log(res.data);
       })
     .catch(err => console.log(err));
 }
