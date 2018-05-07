@@ -12,16 +12,33 @@ import * as resizable from 'reactabular-resizable';
 import * as resolve from 'table-resolver';
 import VisibilityToggles from 'react-visibility-toggles';
 import * as tree from 'treetabular';
+import ReactModal from 'react-modal';
 
 import {
   Paginator, PrimaryControls, paginate
 } from '../helpers';
- 
+
+const customStyles = {
+  content : {
+    top                   : '25%',
+    left                  : '25%',
+    right                 : 'auto',
+    bottom                : 'auto',
+    marginRight           : '-50%',
+    transform             : 'translate(-50%, -50%)',
+    width                 : '500px'
+  }
+};
+
+ReactModal.setAppElement('body')
+
 export class JobViewer extends React.Component {
     constructor(props) {
     super(props);
     
     this.state = {
+      showModal: false,
+      selectedrow: {},
       query: {},
       columns: this.getColumns(),
       rows: [],
@@ -41,6 +58,7 @@ export class JobViewer extends React.Component {
     this.onPerPage = this.onPerPage.bind(this);
     this.onRemove = this.onRemove.bind(this);
     this.onToggleColumn = this.onToggleColumn.bind(this);
+    this.handleCloseModal = this.handleCloseModal.bind(this);
   }
 
 componentDidMount() {
@@ -533,6 +551,11 @@ return [
 ];
 }
 
+  handleCloseModal () {
+    this.setState({ showModal: false });
+  }
+
+
   render() {
 
     const {
@@ -552,6 +575,10 @@ return [
         )
       })
     )(rows);
+
+  const popMenu = (
+    <li href={this.state.selectedrow.LOG_FILE_URL1}> {this.state.selectedColumn.LOG_FILE_DESC1} </li>
+  )
 
     return (
       <div>
@@ -584,6 +611,15 @@ return [
           </Table.Header>
 
           <Table.Body onRow={this.onRow} rows={paginated.rows} rowKey="id" />
+
+        <ReactModal
+          style={customStyles}
+          isOpen={this.state.showModal}
+          contentLabel="Minimal Modal Example"
+        >
+        <div> {popMenu} </div>
+        <button onClick={this.handleCloseModal}>Close Modal</button>
+        </ReactModal>
 
         </Table.Provider>
 
@@ -624,6 +660,8 @@ return [
       </div>
     );
   }
+
+
   onToggleColumn({ columnIndex }) {
     const columns = cloneDeep(this.state.columns);
     const column = columns[columnIndex];
@@ -643,6 +681,8 @@ return [
   }
   onRowSelected(row) {
     console.log('clicked row', row);
+    this.setState({ showModal: true });
+    this.setState({ selectedrow: row});
   }
   onColumnChange(searchColumn) {
     this.setState({
@@ -684,7 +724,6 @@ return [
     this.setState({ rows });
   }
 }
-
 
 function sortHeader(sortable, getSortingColumns) {
   return (value, { columnIndex }) => {
