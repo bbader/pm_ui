@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Bootstrap core CSS -->
+
+    <link href="/stylesheets/libs/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="/stylesheets/pm.css" rel="stylesheet" type="text/css">
+    <link href="/stylesheets/libs/fontawesome-all.css" rel="stylesheet" />
+    <link href="/stylesheets/libs/sidebar_dynamic_styles.css" rel="stylesheet" />
+
+
+    <title></title>
+</head>
+
+<body>
+
+    <!-- Image and text -->
+    <nav class="navbar navbar-text fixed-top" style="background-color: #0F0F59;">
+            <a class="navbar-brand" href="/">
+                <img src="../../images/CHC_Logo_144x68.jpg" width="144" height="68" class="d-inline-block align-middle" alt=""> </a>
+            <span class="navbar-text" style="align-content: center"> Performance Manager</span>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown"
+                aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </nav>
+
+    <!-- add 4 lines for our fixed menu -->
+    <br>
+    <br>
+    <br>
+    <br>
+
+    <div class="container-fluid ">
+        <div class="row">
+            <div class="col-md-2 float-left col-1 pl-0 pr-0 collapse width show" id="sidebar">
+                <div class="list-group border-0 card text-center text-md-left">
+                    <!-- Data Integration -->
+                    <a href="#dataint" class="list-group-item d-inline-block collapsed" data-toggle="collapse" data-parent="#sidebar" aria-expanded="false">
+                        <i class="fas fa-database"></i>
+                        <span class="d-none d-md-inline">Data Integration</span>
+                    </a>
+                    <div class="collapse" id="dataint">
+                        <a href="#dataintsub1" class="list-group-item" data-toggle="collapse" aria-expanded="false">Subitem 1 </a>
+                        <div class="collapse" id="dataintsub1">
+                            <a href="#" class="list-group-item" data-parent="#dataintsub1">Subitem 1 a</a>
+                            <a href="#" class="list-group-item" data-parent="#dataintsub1">Subitem 2 b</a>
+                            <a href="#dataintsub1sub1" class="list-group-item" data-toggle="collapse" aria-expanded="false">Subitem 3 c </a>
+                            <div class="collapse" id="dataintsub1sub1">
+                                <a href="#" class="list-group-item" data-parent="#dataintsub1sub1">Subitem 3 c.1</a>
+                                <a href="#" class="list-group-item" data-parent="#dataintsub1sub1">Subitem 3 c.2</a>
+
+                                <a href="#dataintsub1sub1sub1" class="list-group-item" data-toggle="collapse" aria-expanded="false">Subitem 3 c A</a>
+                                <div class="collapse" id="dataintsub1sub1sub1">
+                                    <a href="#" class="list-group-item" data-parent="#dataintsub1sub1sub1">Subitem 3 c A.1</a>
+                                </div>
+                            </div>
+                            <a href="#" class="list-group-item" data-parent="#dataintsub1">Subitem 4 d</a>
+                            <a href="#dataintsub1sub2" class="list-group-item" data-toggle="collapse" aria-expanded="false">Subitem 5 e </a>
+                            <div class="collapse" id="dataintsub1sub2">
+                                <a href="#" class="list-group-item" data-parent="#dataintsub1sub2">Subitem 5 e.1</a>
+                                <a href="#" class="list-group-item" data-parent="#dataintsub1sub2">Subitem 5 e.2</a>
+                            </div>
+                        </div>
+                        <a href="#" class="list-group-item" data-parent="#dataint">Subitem 2</a>
+                        <a href="#" class="list-group-item" data-parent="#dataint">Subitem 3</a>
+                    </div>
+
+                    <!-- Business Logic -->
+                    <a href="#" class="list-group-item d-inline-block collapsed" data-parent="#sidebar">
+                        <i class="fas fa-dollar-sign"></i>
+                        <span class="d-none d-md-inline">Business Logic</span>
+                    </a>
+
+                    <!-- Presentation -->
+                    <a href="#pres" class="list-group-item d-inline-block collapsed" data-toggle="collapse" data-parent="#sidebar" aria-expanded="false">
+                        <i class="fas fa-table"></i>
+                        </i>
+                        <span class="d-none d-md-inline">Presentation</span>
+                    </a>
+                    <div class="collapse" id="pres">
+                        <a href="#" class="list-group-item" data-parent="#pres">3.1</a>
+                        <a href="#pressub2" class="list-group-item" data-toggle="collapse" aria-expanded="false">3.2 </a>
+                        <div class="collapse" id="pressub2">
+                            <a href="#" class="list-group-item" data-parent="#pressub2">3.2 a</a>
+                            <a href="#" class="list-group-item" data-parent="#pressub2">3.2 b</a>
+                            <a href="#" class="list-group-item" data-parent="#pressub2">3.2 c</a>
+                        </div>
+                        <a href="#" class="list-group-item" data-parent="#pres">3.3</a>
+                    </div>
+
+                    <!-- System Administration -->
+                    <a href="#sysadm" class="list-group-item d-inline-block collapsed" data-parent="#sidebar">
+                        <i class="fas fa-desktop"></i>
+                        <span class="d-none d-md-inline">System Administration</span>
+                    </a>
+
+                    <!-- Utilities Menu -->
+                    <a href="#util" class="list-group-item d-inline-block collapsed" data-toggle="collapse" data-parent="#sidebar" aria-expanded="false">
+                        <i class="fas fa-wrench"></i>
+                        </i>
+                        <span class="d-none d-md-inline">Utilities</span>
+                    </a>
+                    <div class="collapse" id="util">
+                        <a href="#onestopsub1" class="list-group-item" data-toggle="collapse" aria-expanded="false">Onestop </a>
+                        <div class="collapse" id="onestopsub1">
+                            <a href="/utilities/onestop/dashboard" class="list-group-item" data-parent="#onestopsub1">Dashboard</a>
+                            <a href="#" class="list-group-item" data-parent="#onestopsub1">Processes</a>
+                            <a href="#" class="list-group-item" data-parent="#onestopsub1">Network</a>
+                            <a href="#" class="list-group-item" data-parent="#onestopsub1">Disks</a>
+                            <a href="#" class="list-group-item" data-parent="#onestopsub1">Logs</a>
+                            <a href="#oracleSub" class="list-group-item" data-toggle="collapse" aria-expanded="false" >Oracle</a>
+                            <div class="collapse" id="oracleSub">
+                                <a href="/utilities/onestop/oracleTableSpace" class="list-group-item" data-parent="#oracleSub">Check Table Space</a>
+                                <a href="/utilities/onestop/oracleParameters" class="list-group-item" data-parent="#oracleSub">Check Oracle Parameters</a>
+                                <a href="/utilities/onestop/oracleLongRunning" class="list-group-item" data-parent="#oracleSub">Check for Long Running Queries</a>
+                                <a href="/utilities/onestop/oracleQueryReservation" class="list-group-item" data-parent="#oracleSub">Query Reservation Table</a>
+                                <a href="/utilities/onestop/oracleGetAppliedRounds" class="list-group-item" data-parent="#oracleSub">Check Applied Rounds</a>
+                                <a href="/utilities/onestop/oraclecheckRounds" class="list-group-item" data-parent="#oracleSub">Check Rounds</a>
+                                <a href="/utilities/onestop/oraclecheckMaxProcesses" class="list-group-item" data-parent="#oracleSub">Check Max Processes</a>
+                                <a href="/utilities/onestop/oraclecheckGRStatus" class="list-group-item" data-parent="#oracleSub">Check Grouping and Reimbursement Status</a>
+                                <a href="/utilities/onestop/oraclecheckLocks" class="list-group-item" data-parent="#oracleSub">Chack Oracle Locks</a>
+                                <a href="/utilities/onestop/oraclecheckActivity" class="list-group-item" data-parent="#oracleSub">Chack Oracle Activity</a>
+                               <!-- <a href="#" class="list-group-item" data-parent="#oracleSub"></a> -->
+                            </div>
+    
+                            <a href="#" class="list-group-item" data-parent="#onestopsub1">Admin</a>
+                        </div>
+                            <!-- <a href="/onestop_dashboard" class="list-group-item" data-toggle="collapse" aria-expanded="false">Dashboard </a> -->
+
+                        <a href="/utilities/jobViewer" class="list-group-item" data-parent="#util"> Job Viewer </a>
+                    </div>
+                </div>
+            </div>  <!-- End of menu -->
+            <div class="col">
+
+ 

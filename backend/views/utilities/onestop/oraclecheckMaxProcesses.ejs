@@ -1,0 +1,40 @@
+<% include ../../partials/header %>
+
+<div class="container ">
+    <div class="pmdata">
+            <div class="table-responsive-lg">
+            <table class="table table-bordered">
+                <thead>
+                    <tr class="d-flex">
+                        <th class="col-sm-12 header3" >Check Max Processes</th>
+                    </tr>
+
+                    <tr class="d-flex">
+                        <th class="col-sm-3 header4" ><%= data.metaData[0].name %></th>
+                        <th class="col-sm-3 header4" ><%= data.metaData[1].name %></th>
+                        <th class="col-sm-3 header4" ><%= data.metaData[2].name %></th>
+                        <th class="col-sm-3 header4" ><%= data.metaData[3].name %></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <% for (let i of data.rows) { %>
+                        <tr class="d-flex">
+                            <th class="col-sm-3 rowtext" > <%= i.RESOURCE_NAME %>  </th>
+                            <th class="col-sm-3 rowtext" > <%= i.INITIAL_ALLOCATION %>  </th>
+                            <th class="col-sm-3 rowtext" > <%= i.CURRENT_UTILIZATION %>  </th>
+                            <th class="col-sm-3 rowtext" > <%= i.MAX_UTILIZATION %>  </th>
+
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+ 
+<br><br>
+
+<hr>
+</div>
+
+<% include ../../partials/footer %>

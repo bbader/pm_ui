@@ -1,0 +1,48 @@
+<% include ../../partials/header %>
+
+<div class="container ">
+    <div class="pmdata">
+            <div class="table-responsive-lg">
+            <table class="table table-bordered">
+                <thead>
+                    <tr class="d-flex">
+                        <th class="col-sm-12 header3" >Check Locks</th>
+                    </tr>
+
+                    <tr class="d-flex">
+                        <th class="col-sm-2 header4" ><%= data.metaData[0].name %></th>
+                        <th class="col-sm-2 header4" ><%= data.metaData[1].name %></th>
+                        <th class="col-sm-2 header4" ><%= data.metaData[2].name %></th>
+                        <th class="col-sm-2 header4" ><%= data.metaData[3].name %></th>
+                        <th class="col-sm-2 header4" ><%= data.metaData[4].name %></th>
+                        <th class="col-sm-2 header4" ><%= data.metaData[5].name %></th>
+                        <th class="col-sm-2 header4" ><%= data.metaData[6].name %></th>
+                        <th class="col-sm-2 header4" ><%= data.metaData[7].name %></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <% for (let i of data.rows) { %>
+                        <tr class="d-flex">
+                            <th class="col-sm-2 rowtext" > <%= i.OBJECT_NAME %>  </th>
+                            <th class="col-sm-2 rowtext" > <%= i.OBJECT_TYPE %>  </th>
+                            <th class="col-sm-2 rowtext" > <%= i.SESSION_ID %>  </th>
+                            <th class="col-sm-2 rowtext" > <%= i.TYPE %>  </th>
+                            <th class="col-sm-2 rowtext" > <%= i.LMODE %>  </th>
+                            <th class="col-sm-2 rowtext" > <%= i.REQUEST %>  </th>
+                            <th class="col-sm-2 rowtext" > <%= i.BLOCK %>  </th>
+                            <th class="col-sm-2 rowtext" > <%= i.CTIME %>  </th>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+ 
+<br><br>
+
+
+<hr>
+</div>
+
+<% include ../../partials/footer %>

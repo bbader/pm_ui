@@ -1,0 +1,41 @@
+<% include ../../partials/header %>
+
+<div class="container ">
+    <div class="pmdata">
+            <div class="table-responsive-lg">
+            <table class="table table-bordered">
+                <thead>
+                    <tr class="d-flex">
+                        <th class="col-sm-10 header3" >Check G&R Status</th>
+                    </tr>
+
+                    <tr class="d-flex">
+                        <th class="col-sm-2 header4" ><%= data.metaData[0].name %></th>
+                        <th class="col-sm-2 header4" ><%= data.metaData[1].name %></th>
+                        <th class="col-sm-2 header4" ><%= data.metaData[2].name %></th>
+                        <th class="col-sm-2 header4" ><%= data.metaData[3].name %></th>
+                        <th class="col-sm-2 header4" ><%= data.metaData[4].name %></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <% for (let i of data.rows) { %>
+                        <tr class="d-flex">
+                            <th class="col-sm-2 rowtext" > <%= i.JOB_PROCESS_NUM %>  </th>
+                            <th class="col-sm-2 rowtext" > <%= i.START_DATE %>  </th>
+                            <th class="col-sm-2 rowtext" > <%= i.JOB_STATUS %>  </th>
+                            <th class="col-sm-2 rowtext" > <%= i.NAME %>  </th>
+                            <th class="col-sm-2 rowtext" > <%= i.DATA_SET_ID %>  </th>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+ 
+<br><br>
+
+<hr>
+</div>
+
+<% include ../../partials/footer %>

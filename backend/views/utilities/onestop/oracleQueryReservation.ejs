@@ -1,0 +1,39 @@
+
+<% include ../../partials/header %>
+
+<div class="container">
+    <div class="pmdata">
+        <div class="table-responsive-lg">
+            <table class="table table-bordered">
+                <thead>
+                    <tr class="d-flex">
+                        <th class="col-sm-12 header3" >Reservation Table</th>
+                    </tr>
+
+                    <tr class="d-flex">
+                        <% for (let i of data.metaData) { %>
+                            <th class="col-sm-2 header4" ><%= i.name %></th>
+                        <% } %>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <% for (let i of data.rows) { %>
+                        <tr class="d-flex">
+                            <th class="col-sm-2 rowtext" > <%= i.OWNER_NAME %></th>
+                            <th class="col-sm-2 rowtext" > <%= i.CONTROLLER_IP %>  </th>
+                            <th class="col-sm-2 rowtext" > <%= i.CONTROLLER_PORT %>  </th>
+                            <th class="col-sm-2 rowtext" > <%= i.RESERVATION_TYPE %>  </th>
+                            <th class="col-sm-2 rowtext" > <%= i.TARGET_ID %>  </th>
+                            <th class="col-sm-2 rowtext" > <%= i.TIME_EXPIRES %>  </th>
+                            <th class="col-sm-2 rowtext" > <%= i['TIME_RESERVED HEADING'] %>  </th>
+                            <th class="col-sm-2 rowtext" > <%= i.UNIQUE_ID %>  </th>    
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+ 
+
+<% include ../../partials/footer %>

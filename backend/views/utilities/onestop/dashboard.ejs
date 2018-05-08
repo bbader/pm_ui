@@ -1,0 +1,186 @@
+<% include ../../partials/header %>
+
+<div class="container ">
+<div class="osheader" style="margin-top: 10px">
+    <div class="table-row header2">
+        <div class="text">Current Time</div>
+        <div class="text">Server </div>
+    </div>
+
+    <div class="table-row">
+        <div class="text"><%= data.currentTime %></div>
+        <div class="text"><%= data.osInfo.hostname %> </div>
+    </div>
+</div>
+
+<br> <br>
+
+ <div class="pmdata"> 
+    <div class="container-fluid" style="margin-top: 10px">
+        <div class="table-row header2">
+            <div class="text">PM Ver</div>
+        </div>
+        <div class="table-row header">
+            <div class="text">Major</div>
+            <div class="text">Minor</div>
+            <div class="text">SP</div>
+            <div class="text">CP</div>
+        </div>
+              
+        <div class="table-row">
+            <div class="text"><%= data.pm_ver.major %></div>
+            <div class="text"><%= data.pm_ver.minor %></div>
+            <div class="text"><%= data.pm_ver.sp %></div>
+            <div class="text"><%= data.pm_ver.cp %></div>
+        </div>
+    </div>
+</div>
+
+<br><br>
+
+<div class="pmdata">
+    <div class="container-fluid" style="margin-top: 10px">
+            <div class="table-row header2">
+                 <div class="text">CPU</div>
+            </div>
+            <div class="table-row header">
+                 <div class="text">Load Avg</div>
+                 <div class="text">User</div>
+                 <div class="text">System</div>
+                 <div class="text">Idle</div>
+                 <div class="text">I/O Wait</div>
+                 <div class="text">Cores</div>
+            </div>
+            <div class="table-row">
+                <div class="text"><%= data.curr_load.avgload %> %</div>
+                <div class="text"><%= parseFloat(data.curr_load.currentload_user).toPrecision(4) %> %</div>
+                <div class="text"><%= parseFloat(data.curr_load.currentload_system).toPrecision(4) %> %</div>
+                <div class="text"><%= parseFloat(data.curr_load.currentload_idle).toPrecision(4) %> %</div>
+                <div class="text"><%= parseFloat(data.curr_load.currentload_irq).toPrecision(4) %> %</div>
+                <div class="text"><%= data.cpu_data.cores %></div>
+            </div>
+    </div>
+</div>
+
+<br><br>
+
+<div class="pmdata">
+    <div class="container-fluid" style="margin-top: 10px">
+        <div class="table-row header2">
+            <div class="text">Memory</div>
+        </div>
+        <div class="table-row header">
+            <div class="text">Total</div>
+            <div class="text">Free</div>
+            <div class="text">Used</div>
+            <div class="text">Active</div>
+            <div class="text">Buffer Cache</div>
+            <div class="text">Available</div>
+        </div>
+        <div class="table-row">
+            <div class="text"><%= data.mem_data.total %> GB</div>
+            <div class="text"><%= data.mem_data.free %> GB</div>
+            <div class="text"><%= data.mem_data.used %> GB</div>
+            <div class="text"><%= data.mem_data.active %> GB</div>
+            <div class="text"><%= data.mem_data.buffcache %> GB</div>
+            <div class="text"><%= data.mem_data.available %> GB</div>
+        </div>
+<br><br>
+        <div class="table-row header2">
+            <div class="text">Swap Space</div>
+        </div>
+        <div class="table-row header">
+            <div class="text">Total</div>
+            <div class="text">Free</div>
+            <div class="text">Used</div>
+        </div>
+        <div class="table-row">
+            <div class="text"><%= data.mem_data.swaptotal %> GB</div>
+            <div class="text"><%= data.mem_data.swapfree %> GB</div>
+            <div class="text"><%= data.mem_data.swapused %> GB</div>
+        </div>
+    </div>
+</div>
+
+<br><br>
+<!-- Network -->
+<div class="pmdata">
+    <div class="container-fluid" style="margin-top: 10px">
+        <div class="table-row header2">
+            <div class="text">Network</div>
+        </div>
+        <div class="table-row header">
+            <div class="text">Interface</div>
+            <div class="text">IP</div>
+            <div class="text">RX/s</div>
+            <div class="text">TX/s</div>
+        </div>
+        <% var count = 0 %>
+        <% for (let i of data.network_data) { %>
+            <div class="table-row">
+                <div class="text"><%= i.iface %></div>
+                <div class="text"><%= i.ip4 %></div>
+                <div class="text"><%= parseFloat(data.network_stats[count].rx_sec).toPrecision(6) %></div>
+                <div class="text"><%= parseFloat(data.network_stats[count].tx_sec).toPrecision(6) %></div>
+            </div>
+            <% count++ %>
+        <% } %>
+
+    </div>
+</div>
+<br><br>
+<!-- Disks -->
+<div class="pmdata">
+    <div class="container-fluid" style="margin-top: 10px">
+        <div class="table-row header2">
+            <div class="text">Disks</div>
+        </div>
+        <div class="table-row header">
+            <div class="text">Device</div>
+            <div class="text">Mounted</div>
+            <div class="text">Total</div>
+            <div class="text">Used</div>
+            <div class="text">Free</div>
+        </div>
+        <% for (let i of data.fileSystem) { %>
+            <div class="table-row">
+                <div class="text"><%= i.fs %></div>
+                <div class="text"><%= i.mount %></div>
+                <div class="text"><%= i.size %> GB</div>
+                <div class="text"><%= i.used %> GB</div>
+                <div class="text"><%= parseFloat(i.size - i.used).toPrecision(4) %> GB</div>
+            </div>
+        <% } %>
+    </div>
+</div>
+<br><br>
+<!-- Users -->
+<div class="pmdata">
+    <div class="container-fluid" style="margin-top: 10px">
+        <div class="table-row header2">
+            <div class="text">Users</div>
+        </div>
+        <div class="table-row header">
+            <div class="text">User</div>
+            <div class="text">TTY</div>
+            <div class="text">Date Started</div>
+            <div class="text">Remote login IP</div>
+            <div class="text">Last Command</div>
+        </div>
+        <% for (let i of data.userData) { %>
+            <div class="table-row">
+                <div class="text"><%= i.user %></div>
+                <div class="text"><%= i.tty %></div>
+                <div class="text"><%= i.date %> </div>
+                <div class="text"><%= i.ip %> </div>
+                <div class="text"><%= i.command %> </div>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<hr>
+</div> <!-- End of onestop_container -->
+
+
+<% include ../../partials/footer %>

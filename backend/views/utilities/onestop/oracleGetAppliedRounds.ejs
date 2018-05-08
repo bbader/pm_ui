@@ -1,0 +1,38 @@
+<% include ../../partials/header %>
+
+<div class="container ">
+    <div class="pmdata">
+            <div class="table-responsive-lg">
+            <table class="table table-bordered">
+                <thead>
+                    <tr class="d-flex">
+                        <th class="col-sm-12 header3" >Applied Rounds</th>
+                    </tr>
+
+                    <tr class="d-flex">
+                        <th class="col-sm-4 header4" ><%= data.metaData[0].name %></th>
+                        <th class="col-sm-4 header4" ><%= data.metaData[1].name %></th>
+                        <th class="col-sm-4 header4" ><%= data.metaData[2].name %></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <% for (let i of data.rows) { %>
+                        <tr class="d-flex">
+                            <th class="col-sm-4 rowtext" > <%= i.NAME %>  </th>
+                            <th class="col-sm-4 rowtext" > <%= i.DATE_SUPPLIED %>  </th>
+                            <th class="col-sm-4 rowtext" > <%= i.DATE_APPLIED %></th>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+ 
+<br><br>
+
+
+<hr>
+</div>
+
+<% include ../../partials/footer %>

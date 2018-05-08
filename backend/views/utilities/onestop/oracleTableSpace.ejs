@@ -1,0 +1,36 @@
+<% include ../../partials/header %>
+
+<div class="container ">
+
+    <div class="pmdata">
+        <div class="container-fluid" style="margin-top: 10px">
+            <div class="table-row header2">
+                <div class="text">Table Space</div>
+            </div>
+
+            <div class="table-row header">
+                <div class="text"> <%= data.metaData[0].name %> </div>
+                <div class="text"> <%= data.metaData[1].name %> </div>
+                <div class="text"> <%= data.metaData[2].name %> </div>
+                <div class="text"> <%= data.metaData[3].name %> </div>
+                <div class="text"> <%= data.metaData[4].name %> </div>
+            </div>
+
+            <% for (let i of data.rows) { %>
+                <div class="table-row">
+                    <div class="text"><%= i.Tablespace %></div>
+                    <div class="text"><%= i['Size (MB)'] %></div>
+                    <div class="text"><%= i['Free (MB)'] %></div>
+                    <div class="text"><%= i['% Free'] %></div>
+                    <div class="text"><%= i['% Used'] %></div>
+                </div>
+            <% } %>
+        </div>
+    </div>
+ 
+<br><br>
+
+<hr>
+</div>
+
+<% include ../../partials/footer %>

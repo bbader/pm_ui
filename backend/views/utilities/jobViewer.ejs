@@ -1,0 +1,83 @@
+<% include ../partials/header %>
+
+<div class="container">
+    <div class="pmdata">
+        <div class="table-responsive-lg">
+            <table class="table table-bordered">
+                <thead>
+                    <tr class="d-flex">
+                        <th class="col-sm-12 header3" >Job Viewer</th>
+                    </tr>
+
+                    <tr class="d-flex">
+                        <th class="col-sm-1 header4" >JOB_NUMBER</th>
+                        <th class="col-sm-1 header4" >START_DATE</th>
+                        <th class="col-sm-1 header4" >FINISH_DATE</th>
+                        <th class="col-sm-1 header4" >STATUS</th>
+                        <th class="col-sm-1 header4" >FINISH_STATUS</th>
+                        <th class="col-sm-1 header4" >STATUS_MESSAGE</th>
+                        <th class="col-sm-1 header4" >JOB_NAME</th>
+                        <th class="col-sm-1 header4" >PERCENT_COMPLETE</th>
+                        <th class="col-sm-1 header4" >JOB_TYPE_ID</th>
+                        <th class="col-sm-1 header4" >OWNER_ID</th>
+                        <th class="col-sm-1 header4" >PDS_FUNCTION_ID</th>
+                        <th class="col-sm-1 header4" >LOG_FILES</th>
+                        <th class="col-sm-1 header4" >JOB_DEFINITION_ID</th>
+                        <th class="col-sm-1 header4" >JOB_MGR_PID</th>
+                        <th class="col-sm-1 header4" >JOB_STEP_ID</th>                       
+                        <th class="col-sm-1 header4" >SCHEDULED_DATE</th>
+                        <th class="col-sm-1 header4" >SECONDARY_USER_ID</th>
+                        <th class="col-sm-1 header4" >UNIQUE_ID</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <% for (let i of data.sqlResult) { %>
+                        <tr class="d-flex">
+                            <th class="col-sm-1 rowtext" > <%= i.JOB_NUMBER %>  </th>
+                            <th class="col-sm-1 rowtext" > <%= i.START_DATE %>  </th>
+                            <th class="col-sm-1 rowtext" > <%= i.FINISH_DATE %></th>
+                            <th class="col-sm-1 rowtext" > <%= i.STATUS %>   </th>
+                            <th class="col-sm-1 rowtext" > <%= i.FINISH_STATUS %>  </th>
+                            <th class="col-sm-1 rowtext" > <%= i.STATUS_MESSAGE %>  </th>
+                            <th class="col-sm-1 rowtext" > <%= i.JOB_NAME %>  </th>
+                            <th class="col-sm-1 rowtext" > <%= i.PERCENT_COMPLETE %>  </th>
+                            <th class="col-sm-1 rowtext" > <%= i.JOB_TYPE_ID %>  </th>
+                            <th class="col-sm-1 rowtext" > <%= i.OWNER_ID %>  </th>
+                            <th class="col-sm-1 rowtext" > <%= i.PDS_FUNCTION_ID %>  </th>
+
+                            <% if (i.LOG_FILES != null) { %> 
+                                <td class="col-sm-1 rowtext"><div class="btn-group">
+                                    <button type="button" class="btn btn-danger">Open File</button>
+                                    <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                                        <span class="caret"></span>
+                                        <span class="sr-only">Toggle Dropdown</span>
+                                    </button>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li><a href="/utilities/readlogfile?log=<%= i.LOG_FILE_URL1 %>"> <%= i.LOG_FILE_DESC1 %> </a></li>
+                                        <li><a href="/utilities/readlogfile?log=<%= i.LOG_FILE_URL2 %>"> <%= i.LOG_FILE_DESC2 %> </a></li>
+                                        <li><a href="/utilities/readlogfile?log=<%= i.LOG_FILE_URL3 %>"> <%= i.LOG_FILE_DESC3 %></a></li>
+                                        <li><a href="/utilities/readlogfile?log=<%= i.LOG_FILE_URL4 %>"> <%= i.LOG_FILE_DESC4 %></a></li>
+                                        <li><a href="/utilities/readlogfile?log=<%= i.LOG_FILE_URL5 %>"> <%= i.LOG_FILE_DESC5 %></a></li>
+
+                                    </ul>
+                                  </div></td>    
+                            <% } else { %>
+                                <th class="col-sm-1 rowtext" >  <%= i.LOG_FILES %>   </th>                       
+                            <% } %>
+
+                            <th class="col-sm-1 rowtext" > <%= i.JOB_DEFINITION_ID %>  </th>
+                            <th class="col-sm-1 rowtext" > <%= i.JOB_MGR_PID %>  </th>                       
+                            <th class="col-sm-1 rowtext" > <%= i.JOB_STEP_ID %>  </th>
+                            <th class="col-sm-1 rowtext" > <%= i.SCHEDULED_DATE %>  </th>
+                            <th class="col-sm-1 rowtext" > <%= i.SECONDARY_USER_ID %>  </th>
+                            <th class="col-sm-1 rowtext" > <%= i.UNIQUE_ID %>  </th>    
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    
+<% include ../partials/footer %>

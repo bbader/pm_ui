@@ -1,0 +1,177 @@
+
+
+body, html {
+    width: 100%;
+    height: 100%;
+}
+
+.navbar-nav {
+	color: white;
+}
+
+.nav-link {
+	color: white;
+}
+
+.navbar-brand {
+	color: white;
+}
+
+.navbar-text {
+	color: #f42a4d;
+	font-size: large;
+}
+
+.nav-item a:hover {
+    color: #46EAA7 !important;
+    cursor: pointer;
+}
+ 
+ .dropdown-item {
+	color: white !important;
+}
+
+.dropdown:hover>.dropdown-menu {
+  display: block;
+  background-color: #37474F;
+}
+
+.container .dropdown .dropdown-menu a:hover
+{
+  color: #EA40AC;
+  background-color: #37474F;
+  border-color: rgb(231, 17, 17);
+}
+
+.navbar-expand-lg .navbar-nav .dropdown-menu {
+  background-color: #37474F;
+}
+
+.custom-toggler .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255,255,255, 0.5)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
+}
+
+.custom-toggler.navbar-toggler {
+  border-color: rgba(255, 255, 255, 1);
+} 
+
+.fas {
+  padding: 10px;
+}
+
+.footer{ 
+       position: relative;    
+       text-align: center;    
+       bottom: 50px; 
+       width: 100%;
+ }  
+
+/* Onestop CSS */
+
+hr {
+  display: block;
+  height: 1px;
+  border: 0;
+  border-top: 1px solid #ccc;
+  margin: 1em 0;
+  padding: 0; 
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+.pmdata {
+  box-sizing: border-box;
+  text-align:center;
+}
+
+ /* Main container: initialize the flex, direction is row*/
+ .table-row {
+   display: flex;           display: -webkit-flex;
+   flex-direction: row;     -webkit-flex-direction: row;
+   flex-grow: 0;            -webkit-flex-grow: 0;
+   flex-wrap: wrap;         -webkit-flex-wrap: wrap;
+   width: 100%;
+   padding-left: 15px;
+   padding-right: 15px;
+ }
+ 
+ /* // Text based cells: grow, truncate and show ellipsis when there is not enough space */
+ .text {
+   flex-grow: 1;            -webkit-flex-grow: 1;
+   overflow: hidden;
+   white-space: nowrap;
+   text-overflow: ellipsis;
+   padding-right: 20px;
+ }
+ 
+ /* // Fix the minimum width of the leaf level cells */
+ .text {
+   width: 200px;
+ }
+ 
+ .num {
+   width: 80px;
+ }
+ 
+ .table-row {
+   border-bottom: 2px solid #e0e0e0;
+   border-collapse: collapse;
+   padding-top: 5px;
+ }
+ 
+ .table-row.header {
+   background-color: #FFEEDB;
+   font-weight: bold;
+   padding-top: 8px;
+   padding-bottom: 8px;
+ }
+ 
+ .table-row.header2 {
+  background-color: #FFEEDB;
+  font-weight: bold;
+  font-size: 2em;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  text-align: center;
+}
+
+.header3 {
+  background-color: #FFEEDB;
+  font-weight: bold;
+  font-size: 2em;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  text-align: center;
+}
+
+.header4 {
+  background-color: #FFEEDB;
+  font-weight: bold;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.rowtext {
+  font-size: .750rem;
+  font-weight: normal;
+}
+
+/***********************/
+.btn-group {  
+  white-space: nowrap;              
+}
+.btn-group .btn {  
+  float: none;
+  display: inline-block;
+}
+.btn + .dropdown-toggle { 
+  margin-left: -4px;
+}
+
+.table-responsive-lg {
+overflow-y: visible !important;
+}
+
