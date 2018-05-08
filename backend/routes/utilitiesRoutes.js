@@ -32,5 +32,19 @@ router.get("/readlogfile", function(req, res) {
 })
 
 
+router.get("/readlogfile/fe", function(req, res) {
+    //console.log(req.query.log);
+
+    fs.readFile(req.query.log, 'utf8', function (err,data) {
+    if (err) {
+        return console.log(err);
+    }
+    //console.log(data);
+    return res.status(200).json(data);
+    });
+
+})
+
+
 
 module.exports = router;

@@ -13,10 +13,12 @@ import * as resolve from 'table-resolver';
 import VisibilityToggles from 'react-visibility-toggles';
 import * as tree from 'treetabular';
 import ReactModal from 'react-modal';
+import PopMenu from '../helpers/popupmenu';
 
 import {
   Paginator, PrimaryControls, paginate
 } from '../helpers';
+
 
 const customStyles = {
   content : {
@@ -47,8 +49,14 @@ export class JobViewer extends React.Component {
       pagination: { // initial pagination settings
         page: 1,
         perPage: 10
-      }
-      };
+      },
+
+      title: 'PopUp Menu',
+  showOk: true,
+  okText: 'OK',
+  okDisabled: false
+
+    };
 
     this.onRow = this.onRow.bind(this);
     this.onRowSelected = this.onRowSelected.bind(this);
@@ -576,9 +584,6 @@ return [
       })
     )(rows);
 
-  const popMenu = (
-    <li href={this.state.selectedrow.LOG_FILE_URL1}> {this.state.selectedColumn.LOG_FILE_DESC1} </li>
-  )
 
     return (
       <div>
@@ -616,9 +621,10 @@ return [
           style={customStyles}
           isOpen={this.state.showModal}
           contentLabel="Minimal Modal Example"
-        >
-        <div> {popMenu} </div>
-        <button onClick={this.handleCloseModal}>Close Modal</button>
+          >
+        <PopMenu items={this.state.selectedrow}/>
+        <button className='btn-sm btn-info' onClick={this.handleCloseModal}>Close</button>
+
         </ReactModal>
 
         </Table.Provider>
@@ -630,9 +636,6 @@ return [
             onSelect={this.onSelect}
           />
         </div>
-
-
-
 
         {/* <VisibilityToggles
           columns={columns}
@@ -683,6 +686,7 @@ return [
     console.log('clicked row', row);
     this.setState({ showModal: true });
     this.setState({ selectedrow: row});
+    //popupmenu(row);
   }
   onColumnChange(searchColumn) {
     this.setState({
