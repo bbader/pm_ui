@@ -622,6 +622,7 @@ return [
           isOpen={this.state.showModal}
           contentLabel="Minimal Modal Example"
           >
+          <ReactModal.Header closeButton> <ReactModal.Title>{'Logs'}</ReactModal.Title></ReactModal.Header>
         <PopMenu items={this.state.selectedrow}/>
         <button className='btn-sm btn-info' onClick={this.handleCloseModal}>Close</button>
 
