@@ -13,7 +13,7 @@ import * as resolve from 'table-resolver';
 import VisibilityToggles from 'react-visibility-toggles';
 import * as tree from 'treetabular';
 import ReactModal from 'react-modal';
-import PopMenu from '../helpers/popupmenu';
+import ReactDOM from 'react-dom';
 
 import {
   Paginator, PrimaryControls, paginate
@@ -32,7 +32,7 @@ const customStyles = {
   }
 };
 
-ReactModal.setAppElement('body')
+ReactModal.setAppElement('body');
 
 export class JobViewer extends React.Component {
     constructor(props) {
@@ -54,10 +54,12 @@ export class JobViewer extends React.Component {
       title: 'PopUp Menu',
   showOk: true,
   okText: 'OK',
-  okDisabled: false
+  okDisabled: false,
+  link: null
 
     };
 
+    this.openLog = this.openLog.bind(this);
     this.onRow = this.onRow.bind(this);
     this.onRowSelected = this.onRowSelected.bind(this);
     this.onColumnChange = this.onColumnChange.bind(this);
@@ -620,14 +622,25 @@ return [
         <ReactModal
           style={customStyles}
           isOpen={this.state.showModal}
-          contentLabel="Minimal Modal Example"
+          contentLabel="Log Modal"
           >
-          <ReactModal.Header closeButton> <ReactModal.Title>{'Logs'}</ReactModal.Title></ReactModal.Header>
-        <PopMenu items={this.state.selectedrow}/>
+
+          <ul>
+          <li onClick= {() => {this.openLog(`http://10.211.55.253:3000/utilities/readlogfile/fe?log=${this.state.selectedrow.LOG_FILE_URL1}`); this.handleCloseModal(); }}> {this.state.selectedrow.LOG_FILE_DESC1} </li>
+
+        {/* <li><a href={`http://10.211.55.253:3000/utilities/readlogfile/fe?log=${this.state.selectedrow.LOG_FILE_URL1}`}> {this.state.selectedrow.LOG_FILE_DESC1} </a></li>
+        <li><a href={`http://10.211.55.253:3000/utilities/readlogfile/fe?log=${this.state.selectedrow.LOG_FILE_URL2}`}> {this.state.selectedrow.LOG_FILE_DESC2} </a></li>
+        <li><a href={`http://10.211.55.253:3000/utilities/readlogfile/fe?log=${this.state.selectedrow.LOG_FILE_URL3}`}> {this.state.selectedrow.LOG_FILE_DESC3} </a></li>
+        <li><a href={`http://10.211.55.253:3000/utilities/readlogfile/fe?log=${this.state.selectedrow.LOG_FILE_URL4}`}> {this.state.selectedrow.LOG_FILE_DESC4} </a></li>
+        <li><a href={`http://10.211.55.253:3000/utilities/readlogfile/fe?log=${this.state.selectedrow.LOG_FILE_URL5}`}> {this.state.selectedrow.LOG_FILE_DESC5} </a></li> */}
+        </ul>
+
+
         <button className='btn-sm btn-info' onClick={this.handleCloseModal}>Close</button>
 
         </ReactModal>
 
+ 
         </Table.Provider>
 
         <div className="controls">
@@ -665,6 +678,28 @@ return [
     );
   }
 
+  openLog(link) {
+    console.log('clicked link', link);
+
+    axios({
+      method:'get',
+      url: link
+    })
+      .then(res => {
+console.log(res.data);
+const log = (
+<div >
+<pre> 
+   {res.data}
+</pre>
+
+</div>
+);
+ReactDOM.render(log, document.getElementById('root'));
+})
+      .catch(err => console.log(err));
+  
+  }
 
   onToggleColumn({ columnIndex }) {
     const columns = cloneDeep(this.state.columns);
@@ -687,7 +722,6 @@ return [
     console.log('clicked row', row);
     this.setState({ showModal: true });
     this.setState({ selectedrow: row});
-    //popupmenu(row);
   }
   onColumnChange(searchColumn) {
     this.setState({
@@ -728,7 +762,10 @@ return [
 
     this.setState({ rows });
   }
+
 }
+
+
 
 function sortHeader(sortable, getSortingColumns) {
   return (value, { columnIndex }) => {
