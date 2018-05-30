@@ -19,6 +19,15 @@ import {
   Paginator, PrimaryControls, paginate
 } from '../helpers';
 
+import {
+  Route
+} from 'react-router-dom';
+
+import  { Redirect } from 'react-router-dom'
+
+import { Link } from 'react-router-dom';
+import {ShowLog} from './showlog';
+
 
 const customStyles = {
   content : {
@@ -626,6 +635,21 @@ return [
           >
 
           <ul>
+
+{/* const Button = () => (
+  <Route render={({ history}) => (
+    <button
+      type='button'
+      onClick={() => { history.push('showlog') }}
+
+    >
+      Click Me!
+    </button>
+  )} />  */}
+
+          {/* <li><Link to='./ShowLog'> show log</Link></li> */}
+
+
           <li onClick= {() => {this.openLog(`http://10.211.55.253:3000/utilities/readlogfile/fe?log=${this.state.selectedrow.LOG_FILE_URL1}`); this.handleCloseModal(); }}> {this.state.selectedrow.LOG_FILE_DESC1} </li>
 
         {/* <li><a href={`http://10.211.55.253:3000/utilities/readlogfile/fe?log=${this.state.selectedrow.LOG_FILE_URL1}`}> {this.state.selectedrow.LOG_FILE_DESC1} </a></li>
@@ -686,16 +710,23 @@ return [
       url: link
     })
       .then(res => {
-console.log(res.data);
-const log = (
-<div >
-<pre> 
-   {res.data}
-</pre>
+// console.log(res.data);
+this.props.history.push( {
+  pathname: 'showlog',
+  state: {link: link}
+});
 
-</div>
-);
-ReactDOM.render(log, document.getElementById('root'));
+//<Route path="/ShowLog" component={ShowLog}/>;
+
+// const log = (
+// <div >
+// <pre> 
+//    {res.data}
+// </pre>
+
+// </div>
+// );
+// ReactDOM.render(log, document.getElementById('root'));
 })
       .catch(err => console.log(err));
   

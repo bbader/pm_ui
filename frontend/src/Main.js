@@ -11,7 +11,7 @@ import {Home} from './components/Home';
 import {Test} from './components/test';
 import {Onestop_Dashboard} from './components/Onestop_Dashboard';
 import {JobViewer} from './components/Jobviewer';
-
+import {ShowLog} from './components/showlog';
 
 class Main extends Component {
   render() {
@@ -28,6 +28,7 @@ class Main extends Component {
             <Route exact path="/test" component={Test}/>
             <Route exact path="/Onestop_Dashboard" component={Onestop_Dashboard}/>
             <Route exact path="/JobViewer" component={JobViewer}/>
+            <Route exact path="/showlog" component={ShowLog}/>
 
             {/* <h1> Bob </h1>
             <button type="button" class="btn  btn-outline-danger">Danger</button> */}
