@@ -13,21 +13,13 @@ import * as resolve from 'table-resolver';
 import VisibilityToggles from 'react-visibility-toggles';
 import * as tree from 'treetabular';
 import ReactModal from 'react-modal';
-import ReactDOM from 'react-dom';
+import PropTypes from 'prop-types'
 
 import {
   Paginator, PrimaryControls, paginate
 } from '../helpers';
 
-import {
-  Route
-} from 'react-router-dom';
-
-import  { Redirect } from 'react-router-dom'
-
-import { Link } from 'react-router-dom';
-import {ShowLog} from './showlog';
-
+import { myConfig } from '../config';
 
 const customStyles = {
   content : {
@@ -44,6 +36,10 @@ const customStyles = {
 ReactModal.setAppElement('body');
 
 export class JobViewer extends React.Component {
+  static propTypes = {
+    history: PropTypes.object.isRequired
+  }
+
     constructor(props) {
     super(props);
     
@@ -83,7 +79,9 @@ export class JobViewer extends React.Component {
 componentDidMount() {
   axios({
     method:'get',
-    url:'http://10.211.55.253:3000/utilities/jobViewer/fe'
+    url: myConfig.base_url + '/utilities/jobViewer/fe'
+    // url: myConfig.base_url 'http://10.211.55.253:3000/utilities/jobViewer/fe'
+
   })
     .then(res => {
       let rows = this.renderRowData(res.data.sqlResult);
@@ -595,6 +593,16 @@ return [
       })
     )(rows);
 
+    const log1 = this.state.selectedrow.LOG_FILE_URL1;
+    const log_desc1 = this.state.selectedrow.LOG_FILE_DESC1;
+    const log2 = this.state.selectedrow.LOG_FILE_URL2;
+    const log_desc2 = this.state.selectedrow.LOG_FILE_DESC2;
+    const log3 = this.state.selectedrow.LOG_FILE_URL3;
+    const log_desc3 = this.state.selectedrow.LOG_FILE_DESC3;
+    const log4 = this.state.selectedrow.LOG_FILE_URL4;
+    const log_desc4 = this.state.selectedrow.LOG_FILE_DESC4;
+    const log5 = this.state.selectedrow.LOG_FILE_URL5;
+    const log_desc5 = this.state.selectedrow.LOG_FILE_DESC5;
 
     return (
       <div>
@@ -635,28 +643,31 @@ return [
           >
 
           <ul>
+          {log_desc1 && (
+          <li onClick= {() => {this.openLog(myConfig.base_url + myConfig.log_url + `${log1}`); this.handleCloseModal(); }}> 
+          <button className='btn-sm btn-primary'>{log_desc1}</button>    </li>
+          )}
 
-{/* const Button = () => (
-  <Route render={({ history}) => (
-    <button
-      type='button'
-      onClick={() => { history.push('showlog') }}
+          {log_desc2 && (
+            <li onClick= {() => {this.openLog(myConfig.base_url + myConfig.log_url + `${log2}`); this.handleCloseModal(); }}> 
+            <button className='btn-sm btn-primary'>{log_desc2}</button>    </li>
+          )}
 
-    >
-      Click Me!
-    </button>
-  )} />  */}
+          {log_desc3 && (
+            <li onClick= {() => {this.openLog(myConfig.base_url + myConfig.log_url + `${log3}`); this.handleCloseModal(); }}> 
+            <button className='btn-sm btn-primary'> {log_desc3} </button>    </li>
+          )}
 
-          {/* <li><Link to='./ShowLog'> show log</Link></li> */}
+          {log_desc4 && (
+          <li onClick= {() => {this.openLog(myConfig.base_url + myConfig.log_url + `${log4}`); this.handleCloseModal(); }}> 
+          <button className='btn-sm btn-primary'> {log_desc4} </button>    </li>
+          )}
 
+          {log_desc5 && (
+          <li onClick= {() => {this.openLog(myConfig.base_url + myConfig.log_url + `${log5}`); this.handleCloseModal(); }}> 
+          <button className='btn-sm btn-primary'> {log_desc5} </button>    </li>
+          )}
 
-          <li onClick= {() => {this.openLog(`http://10.211.55.253:3000/utilities/readlogfile/fe?log=${this.state.selectedrow.LOG_FILE_URL1}`); this.handleCloseModal(); }}> {this.state.selectedrow.LOG_FILE_DESC1} </li>
-
-        {/* <li><a href={`http://10.211.55.253:3000/utilities/readlogfile/fe?log=${this.state.selectedrow.LOG_FILE_URL1}`}> {this.state.selectedrow.LOG_FILE_DESC1} </a></li>
-        <li><a href={`http://10.211.55.253:3000/utilities/readlogfile/fe?log=${this.state.selectedrow.LOG_FILE_URL2}`}> {this.state.selectedrow.LOG_FILE_DESC2} </a></li>
-        <li><a href={`http://10.211.55.253:3000/utilities/readlogfile/fe?log=${this.state.selectedrow.LOG_FILE_URL3}`}> {this.state.selectedrow.LOG_FILE_DESC3} </a></li>
-        <li><a href={`http://10.211.55.253:3000/utilities/readlogfile/fe?log=${this.state.selectedrow.LOG_FILE_URL4}`}> {this.state.selectedrow.LOG_FILE_DESC4} </a></li>
-        <li><a href={`http://10.211.55.253:3000/utilities/readlogfile/fe?log=${this.state.selectedrow.LOG_FILE_URL5}`}> {this.state.selectedrow.LOG_FILE_DESC5} </a></li> */}
         </ul>
 
 
@@ -703,33 +714,10 @@ return [
   }
 
   openLog(link) {
-    console.log('clicked link', link);
-
-    axios({
-      method:'get',
-      url: link
-    })
-      .then(res => {
-// console.log(res.data);
-this.props.history.push( {
-  pathname: 'showlog',
-  state: {link: link}
-});
-
-//<Route path="/ShowLog" component={ShowLog}/>;
-
-// const log = (
-// <div >
-// <pre> 
-//    {res.data}
-// </pre>
-
-// </div>
-// );
-// ReactDOM.render(log, document.getElementById('root'));
-})
-      .catch(err => console.log(err));
-  
+    this.props.history.push( {
+      pathname: 'showlog',
+      link: link
+      });
   }
 
   onToggleColumn({ columnIndex }) {
@@ -750,7 +738,7 @@ this.props.history.push( {
     };
   }
   onRowSelected(row) {
-    console.log('clicked row', row);
+    // console.log('clicked row', row);
     this.setState({ showModal: true });
     this.setState({ selectedrow: row});
   }

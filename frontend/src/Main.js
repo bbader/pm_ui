@@ -12,6 +12,7 @@ import {Test} from './components/test';
 import {Onestop_Dashboard} from './components/Onestop_Dashboard';
 import {JobViewer} from './components/Jobviewer';
 import {ShowLog} from './components/showlog';
+import Login from './components/login'
 
 class Main extends Component {
   render() {
@@ -24,6 +25,7 @@ class Main extends Component {
         <MyMenu/>
 
           <div className="content">
+            <Route exact path="/login" component={Login} />
             <Route exact path="/Home" component={Home}/>
             <Route exact path="/test" component={Test}/>
             <Route exact path="/Onestop_Dashboard" component={Onestop_Dashboard}/>

@@ -1,7 +1,8 @@
 
 var sqlData     = require("../models/onestop");
 var database    = require('./database.js');
-
+var jwt         = require('jsonwebtoken');
+var config      = require("../public/dbconfig");
 
 exports.getTableSpace = function(req, res, next) {
     database.simpleExecute(
@@ -43,7 +44,7 @@ exports.getTableSpace = function(req, res, next) {
     });
 }
 
-exports.getParameters = function(res, req, next) {
+exports.getParameters = function(req, res, next) {
     database.simpleExecute('select name, type, value from V$PARAMETER',
         {},
         {
@@ -59,7 +60,7 @@ exports.getParameters = function(res, req, next) {
         });
 }
 
-exports.getLongRunningQueries = function(res, reg, next) {
+exports.getLongRunningQueries = function(req, res, next) {
     database.simpleExecute(
         "SELECT sid, to_char(start_time, 'hh24:mi:ss') stime, " +
         'message,( sofar/totalwork)* 100 percent ' +
@@ -79,7 +80,7 @@ exports.getLongRunningQueries = function(res, reg, next) {
     });
 }
 
-exports.getReservationTable = function(res, reg, next) {
+exports.getReservationTable = function(req, res, next) {
     database.simpleExecute(
         'select OWNER_NAME, '+
         'CONTROLLER_IP, CONTROLLER_PORT, RESERVATION_TYPE, ' +
@@ -99,7 +100,7 @@ exports.getReservationTable = function(res, reg, next) {
     });
 }
 
-exports.getAppliedRounds = function(res, req, next) {
+exports.getAppliedRounds = function(req, res, next) {
     database.simpleExecute(
         'select name, date_supplied, date_applied ' +
         'from support.patch_history ' +
@@ -119,7 +120,7 @@ exports.getAppliedRounds = function(res, req, next) {
         });    
 }
 
-exports.checkRounds = function(res, req, next) {
+exports.checkRounds = function(req, res, next) {
     database.simpleExecute(
         'select COMPLETION_DATE,VERSION from support.pds_version order by completion_date desc ',
         {},
@@ -136,7 +137,7 @@ exports.checkRounds = function(res, req, next) {
         });    
 }
 
-exports.checkMaxProcesses = function(res, req, next) {
+exports.checkMaxProcesses = function(req, res, next) {
     database.simpleExecute(
         'select resource_name, initial_allocation, CURRENT_UTILIZATION, max_utilization ' +
         'from gv$resource_limit ' +
@@ -155,7 +156,7 @@ exports.checkMaxProcesses = function(res, req, next) {
         });    
 }
 
-exports.checkGRStatus = function(res, req, next) {
+exports.checkGRStatus = function(req, res, next) {
     database.simpleExecute(
         'select JOB_PROCESS_NUM, START_DATE, JOB_STATUS,NAME, DATA_SET_ID from  support.group_reimb_job WHERE start_date > TRUNC(SYSDATE) - 90 order by START_DATE DESC ',
         {},
@@ -172,7 +173,7 @@ exports.checkGRStatus = function(res, req, next) {
         });    
 }
 
-exports.checkLocks = function(res, req, next) {
+exports.checkLocks = function(req, res, next) {
     database.simpleExecute(
         'select ' +
         'object_name, ' +
@@ -205,7 +206,7 @@ exports.checkLocks = function(res, req, next) {
         });    
 }
 
-exports.checkActivity = function(res, req, next) {
+exports.checkActivity = function(req, res, next) {
     database.simpleExecute(
         'select S.USERNAME, s.sid, s.osuser, t.sql_id, sql_text ' +
         'from v$sqltext_with_newlines t,V$SESSION s ' +
@@ -229,7 +230,7 @@ exports.checkActivity = function(res, req, next) {
 }
 
 
-async function getJobViewer(res, reg, next) {
+async function getJobViewer(req, res, next) {
     await database.simpleExecute(
         'SELECT FINISH_DATE, ' +
         'FINISH_STATUS, ' +

@@ -7,10 +7,15 @@ expressSanitizer    = require("express-sanitizer"),
 bodyParser          = require("body-parser"),
 flash               = require("connect-flash"),
 methodOverride      = require('method-override');
-//var oracledb = require('oracledb');
+
 var dbConfig = require('./public/dbconfig.js');
 var database = require('./middleware/database.js');
 
+var auth = require(__dirname + '/routes/auth.js');
+
+var users = require("./routes/users");
+var logins = require("./routes/logins");
+var router;
 
 var PORT = process.env.PORT || 3000;
 
@@ -32,14 +37,17 @@ app.get("/", function(req, res){
     res.render("index");
 });
 
-
-app.use("/utilities/onestop", onestopRoutes);
+app.use("/utilities/onestop", auth(), onestopRoutes);
 
 app.use("/utilities", utilitiesRoutes);
 
+router = express.Router();
+router.post("/users",  users.post);
+router.post('/logins', logins.post);
 
+app.use('/api', router);
 
-database.createPool(dbConfig)
+database.createPool(dbConfig.database)
     .then(function() {
         app.listen(PORT, function(){
             console.log("The Server Has Started!");

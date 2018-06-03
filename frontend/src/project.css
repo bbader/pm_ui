@@ -213,44 +213,4 @@ table {
   padding-left: 0.2em;
 }
 
-/* more from reactabular */
-/* .resize-container {
-  table-layout: fixed;
-  display: table;
-  width: 100%;
-}
-
-.resize-value {
-  display: inline-block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  word-break: break-all;
-  word-wrap: break-word;
-  width: calc(100% - 1px);
-}
-
-.resize-handle {
-  outline: solid 1px black;
-  cursor: col-resize;
-  float: right;
-  width: 0;
-} */
-
-/* for reactjs-popup */
-.menu {
-  width: 200px;
-  display: flex;
-  flex-direction: column;
-  background: #ffffff;
-}
-.menu-item {
-  cursor: pointer;
-  padding: 5px;
-  height: 28px;
-  border-bottom: 1px solid rgb(187, 187, 187);
-}
-.menu-item:hover {
-  color: #2980b9;
-}
 

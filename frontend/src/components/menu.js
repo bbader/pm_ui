@@ -153,7 +153,7 @@ export class MyMenu extends React.Component {
 
 
                       <li className="nav-item dropdown">
-                        <button className="dropdown-toggle">  OneStop  </button>
+                        <button className="dropdown-toggle nav-link">  OneStop  </button>
                           <div className="dropdown-menu" aria-labelledby="navbarDropdown">
                             <NavLink className="nav-link dropdown-item" to="/Onestop_Dashboard">  Dashboard  </NavLink> 
                             <a className="dropdown-item" href="/">Processes</a>
