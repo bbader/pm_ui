@@ -86,6 +86,7 @@ componentDidMount() {
     .then(res => {
       let rows = this.renderRowData(res.data.sqlResult);
       this.setState({rows});
+      console.log(res);
       })
     .catch(err => console.log(err));
 }

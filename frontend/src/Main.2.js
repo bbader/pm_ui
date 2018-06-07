@@ -18,7 +18,16 @@ import axios from 'axios';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
+
 export const history = createHashHistory();
+
+
+
+////////////////////////////////////////////////////////////
+// 1. Click the public page
+// 2. Click the protected page
+// 3. Log in
+// 4. Click the back button, note the URL each time
 
 const Main = () => (
   <Router>
@@ -28,7 +37,7 @@ const Main = () => (
         <div>
         <MyMenu/>
 
-      <AuthButton />
+      {/* <AuthButton /> */}
 
       <Route path="/login" component={Login} />
       <PrivateRoute path="/Home" component={Home} />
@@ -42,59 +51,6 @@ const fakeAuth = {
   authenticate(cb) {
     this.isAuthenticated = true;
     setTimeout(cb, 100); // fake async
-//    this.handleSubmit();
-
-//console.log("HERE");
-    var user = {
-      name: this.state.username,
-      pass: this.state.password,
-      token: []
-    };
-
-    axios({
-      method:'post',
-      url: myConfig.base_url + '/api/logins',
-      data: {name: user.name }
-    })
-      .catch(function (error) {
-        if (error.response) {
-          console.log(error.response);
-          alert(error.response.data.message);
-        }
-      })
-      .then(res => {
-        console.log("PW:", res.data.user.password);
-        console.log("UserPW:", user.pass);
-          bcrypt.compare(user.pass, res.data.user.password, function (err, pwMatch) {
-            var payload;
-
-            if (err) {
-              alert('Error while authenticating user');
-              return;
-            }
-
-            if (!pwMatch) {
-              alert('Invalid name or password.');
-              return;
-            }
-
-            payload = {
-              sub: user.name
-            };
-
-            user.token = jwt.sign(payload, myConfig.jwtSecretKey, {
-              expiresIn: 60 * 60
-            });
-            console.log("Token:", user.token);
-            sessionStorage.setItem('token', user.token);
-            sessionStorage.setItem('loggedin', true);
-          });
-
-        })
-      .catch(err => console.log(err)
-    );
-
-
   },
   signout(cb) {
     this.isAuthenticated = false;
@@ -118,6 +74,7 @@ const AuthButton = withRouter(
     ) : (
       <div>
       <p>You are not logged in.</p>
+      <button onClick={this.Login}>Log in</button>
       </div>
 
     )
@@ -146,43 +103,14 @@ class Login extends Component {
 
   constructor(props) {
     super(props);
-
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  state = {
-    redirectToReferrer: false
-  };
-
-  login = () => {
-    fakeAuth.authenticate(() => {
-      this.setState({ redirectToReferrer: true });
-    });
-  };
 
   render() {
-    const {from} = this.props.location.state || { from: { pathname: "/" } } ;
-    const {redirectToReferrer} = this.state;
-    console.log( from );
-console.log( redirectToReferrer );
-// for (var x = 1; x <1000000000; x++) {
-//   var b = x;
-// }
-    if (redirectToReferrer) {
-      return <Redirect to={from} />;
-    }
 
     return ( 
-
-
-    //   <div>
-    //   <p>You must log in to view the page at {from.pathname}</p>
-    //   <button onClick={this.login}>Log in</button>
-    // </div>
-
-
-
       < div className = "center" >
         <div className = "card" >
           <h1 > Login </h1> 
@@ -205,7 +133,7 @@ console.log( redirectToReferrer );
               className = "form-submit"
               value = "SUBMIT"
               type = "submit"
-              onClick = {this.login }
+              onClick = {this.handleSubmit }
             />
             </form> 
           </div> 
@@ -215,8 +143,6 @@ console.log( redirectToReferrer );
 
   handleSubmit(e) {
     e.preventDefault();
-
-    isAuthenticated: false;
 
     var user = {
       name: this.state.username,
@@ -236,8 +162,8 @@ console.log( redirectToReferrer );
         }
       })
       .then(res => {
-        console.log("PW:", res.data.user.password);
-        console.log("UserPW:", user.pass);
+        // console.log("PW:", res.data.user.password);
+        // console.log("UserPW:", user.pass);
           bcrypt.compare(user.pass, res.data.user.password, function (err, pwMatch) {
             var payload;
 
@@ -261,13 +187,9 @@ console.log( redirectToReferrer );
             console.log("Token:", user.token);
             sessionStorage.setItem('token', user.token);
             sessionStorage.setItem('loggedin', true);
+            const { from } = this.props.location.state || { from: { pathname: "/" } };
 
-            this.isAuthenticated = true;
-
-            // const { from } = this.props.location.state || { from: { pathname: "/" } };
-            // console.log("Pathname: ", { from });
-
-            // return <Redirect to={from} />;
+            return <Redirect to={from} />;
             
             // history.push( {
             //   pathname: 'Home',

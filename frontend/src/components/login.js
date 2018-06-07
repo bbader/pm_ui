@@ -3,11 +3,15 @@ import './login.css';
 import axios from 'axios';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { createHashHistory } from 'history';
 import { myConfig } from '../config';
 
+export const history = createHashHistory();
+
 class Login extends Component {
-  constructor() {
-    super();
+
+  constructor(props) {
+    super(props);
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
@@ -92,6 +96,9 @@ class Login extends Component {
             // console.log("Token:", user.token);
             sessionStorage.setItem('token', user.token);
             sessionStorage.setItem('loggedin', true);
+            history.push( {
+              pathname: 'Home',
+              });
           });
 
         })
