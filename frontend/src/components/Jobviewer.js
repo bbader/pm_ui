@@ -79,8 +79,8 @@ export class JobViewer extends React.Component {
 componentDidMount() {
   axios({
     method:'get',
-    url: myConfig.base_url + '/utilities/jobViewer/fe'
-    // url: myConfig.base_url 'http://10.211.55.253:3000/utilities/jobViewer/fe'
+    url: myConfig.base_url + '/utilities/jobViewer/fe',
+    headers: { 'x-access-token': sessionStorage.getItem('token') }
 
   })
     .then(res => {

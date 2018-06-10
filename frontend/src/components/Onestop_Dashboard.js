@@ -23,9 +23,9 @@ export class Onestop_Dashboard extends React.Component {
 componentDidMount() {
   axios({
     method:'get',
-    url:'http://10.211.55.253:3000/utilities/onestop/dashboard/fe'
-
-    // url:'https://jsonplaceholder.typicode.com/users'
+    url:'http://10.211.55.253:3000/utilities/onestop/dashboard/fe',
+    headers: { 'authorization': sessionStorage.getItem('token'),
+   }
   })
     .then(res => {
       this.setState({currentTime: res.data.currentTime});
@@ -46,9 +46,9 @@ componentDidMount() {
     return (
       <div>
         <h1> Onestop_Dashboard </h1>
-        {this.state.currentTime };
-        {this.state.osInfo.hostname};
-        {this.state.fileSystem.map(res => <li>{res.fs} </li>)};
+        {this.state.currentTime }
+        {this.state.osInfo.hostname}
+        {this.state.fileSystem.map(res => <li>{res.fs} </li>)}
       </div>
     );
   }

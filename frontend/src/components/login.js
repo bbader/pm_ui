@@ -16,7 +16,6 @@ class Login extends Component {
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-
   render() {
 
     return ( 
@@ -93,6 +92,8 @@ class Login extends Component {
             user.token = jwt.sign(payload, myConfig.jwtSecretKey, {
               expiresIn: 60 * 60
             });
+            console.log('CONFIG:', myConfig.jwtSecretKey);
+
             // console.log("Token:", user.token);
             sessionStorage.setItem('token', user.token);
             sessionStorage.setItem('loggedin', true);

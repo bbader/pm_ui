@@ -6,13 +6,17 @@ function auth(role) {
     var token;
     var payload;
 
+    if ('OPTIONS' == req.method) 
+      return res.sendStatus(204);
+
     if (!req.headers.authorization) {
       return res.status(401).send({
-        message: 'You are not authorized'
+        message: 'You are not authorized (1)'
       });
     }
 
-    token = req.headers.authorization.split(' ')[1];
+    // token = req.headers.authorization.split(' ')[1];
+    token = req.headers.authorization;
 
     try {
       payload = jwt.verify(token, config.jwtSecretKey);
@@ -38,7 +42,7 @@ function auth(role) {
       next();
     } else {
       res.status(401).send({
-        message: 'You are not authorized'
+        message: 'You are not authorized (2)'
       });
     }
   }

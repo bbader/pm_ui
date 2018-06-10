@@ -45,15 +45,21 @@ body, html {
   .nav-item a:hover {
     color: #46EAA7 !important;
     cursor: pointer;
+    transition: 2s;
+
   }
   
   .dropdown-item {
   color: white !important;
+  transition: 2s;
+
   }
   
   .dropdown:hover>.dropdown-menu {
   display: block;
   background-color: #37474F;
+  animation-delay: 2s;
+  transition: 2s;
   }
   
   .container .dropdown .dropdown-menu a:hover
@@ -61,10 +67,14 @@ body, html {
   color: #EA40AC;
   background-color: #37474F;
   border-color: rgb(231, 17, 17);
+  animation-delay: 2s;
+  transition: 2s;
   }
   
   .navbar-expand-lg .navbar-nav .dropdown-menu {
   background-color: #37474F;
+  animation-delay: 2s;
+  transition: 2s;
   }
   
   /*******************/
