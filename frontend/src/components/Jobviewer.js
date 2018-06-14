@@ -13,7 +13,7 @@ import * as resolve from 'table-resolver';
 import VisibilityToggles from 'react-visibility-toggles';
 import * as tree from 'treetabular';
 import ReactModal from 'react-modal';
-import PropTypes from 'prop-types'
+import PropTypes from 'prop-types';
 
 import {
   Paginator, PrimaryControls, paginate
@@ -36,9 +36,6 @@ const customStyles = {
 ReactModal.setAppElement('body');
 
 export class JobViewer extends React.Component {
-  static propTypes = {
-    history: PropTypes.object.isRequired
-  }
 
     constructor(props) {
     super(props);
@@ -86,7 +83,7 @@ componentDidMount() {
     .then(res => {
       let rows = this.renderRowData(res.data.sqlResult);
       this.setState({rows});
-      console.log(res);
+      // console.log(res);
       })
     .catch(err => console.log(err));
 }
@@ -733,7 +730,7 @@ return [
     this.setState({ columns, query });
   }
 
-  onRow(row, { rowIndex }) {
+  onRow(row) {
     return {
       onClick: () => this.onRowSelected(row)
     };
@@ -785,6 +782,9 @@ return [
 
 }
 
+JobViewer.propTypes = {
+  history: PropTypes.object.isRequired
+};
 
 
 function sortHeader(sortable, getSortingColumns) {

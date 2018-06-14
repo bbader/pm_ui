@@ -10,10 +10,12 @@ import faDesktop from '@fortawesome/fontawesome-free-solid/faDesktop';
 import faWrench from '@fortawesome/fontawesome-free-solid/faWrench';
 import logo from '../images/CHC_Logo_144x68.jpg';
 import axios from 'axios';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 import { myConfig } from '../config';
 import { createHashHistory } from 'history';
+import PropTypes from 'prop-types';
+
+import bcrypt from 'bcryptjs';
+import jwt from'jsonwebtoken';
 
 import { 
   Navbar,
@@ -85,7 +87,7 @@ export class Navigation extends React.Component {
   }
 
   logout() {
-    sessionStorage.setItem('token', '');
+    sessionStorage.removeItem('token');
     sessionStorage.setItem('isAuthenticated', false);
   }
 
@@ -109,7 +111,7 @@ export class Navigation extends React.Component {
     axios({
       method:'post',
       url: myConfig.base_url + '/api/logins',
-      data: {name: user.username }
+      data: {name: user.username, password: user.password }
     })
       .catch(function (error) {
         if (error.response) {
@@ -118,36 +120,37 @@ export class Navigation extends React.Component {
         }
       })
       .then(res => {
-          //console.log("PW:", res.data.user.password);
-          //console.log("UserPW:", user.pass);
+          // console.log("PW:", res.data.user.password);
+          // console.log("UserPW:", user.pass);
+          // console.log("Token:", res.data.token);
+
           bcrypt.compare(user.password, res.data.user.password, function (err, pwMatch) {
             var payload;
 
             if (err) {
-              alert('Error while authenticating user');
-              return;
+              alert('ERROR: Something wong!');
             }
 
             if (!pwMatch) {
-              alert('Invalid name or password.');
-              return;
+              alert('ERROR: Invalid username or password!');
             }
 
             payload = {
-              sub: user.username
+              sub: user.name
             };
 
             user.token = jwt.sign(payload, myConfig.jwtSecretKey, {
               expiresIn: 60 * 60
             });
-            //console.log("Token:", user.token);
+
             sessionStorage.setItem('token', user.token);
             sessionStorage.setItem('isAuthenticated', true);
             history.push({
               pathname: '/'
             });
+
           });
-        })
+          })
         .catch(err => console.log(err)
     );
   }
@@ -190,6 +193,10 @@ export class Navigation extends React.Component {
       );
     }
   }
+  
+  Navigation.propTypes = {
+  className: PropTypes.object.isRequired
+};
   
 
 export class MyMenu extends React.Component {

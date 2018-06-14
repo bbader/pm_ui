@@ -21,6 +21,7 @@
     "purecss": "^1.0.0",
     "react": "^16.3.2",
     "react-bootstrap": "^0.32.1",
+    "react-bootstrap-table-next": "^0.1.13",
     "react-burger-menu": "^2.4.4",
     "react-css-modules": "^4.7.2",
     "react-dom": "^16.3.2",
@@ -43,7 +44,7 @@
     "treetabular": "^3.5.0"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "PORT=3010 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
