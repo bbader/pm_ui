@@ -12,7 +12,6 @@ import {JobViewer} from './components/Jobviewer';
 import {ShowLog} from './components/showlog';
 
 import { createHashHistory } from 'history';
-import './components/login.css';
 
 import PropTypes from 'prop-types';
 
