@@ -5,10 +5,26 @@ fs = require('fs')
 
 var DashBdData = require("../models/onestop");
 var oracleQueries = require("../middleware/oracleQueries");
+var customObject = require("../middleware/customobject");
+var pmUsers = require("../middleware/pmusers");
 
+const { PMUsers } = pmUsers;
+
+router.get("/pmusers", PMUsers, function (req, res) {
+    return res.status(200).json(DashBdData.sqlResult);
+});
+
+const { getCOTableList, truncateCOTableList } = customObject ;
+
+router.get("/customobject", getCOTableList, function (req, res) {
+    return res.status(200).json(DashBdData.sqlResult);
+});
+
+router.post("/customobject", truncateCOTableList, function (req, res) {
+    return res.status(200).json(DashBdData.sqlResult);
+});
 
 const { getJobViewer } = oracleQueries;
-
 
 router.get("/jobViewer", getJobViewer, function (req, res) {
     res.render("utilities/jobViewer", { data: DashBdData });

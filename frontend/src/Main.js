@@ -1,35 +1,34 @@
-import React from 'react';
-import {
-  BrowserRouter as Router,
-  Route
-} from 'react-router-dom';
 
+
+import React from 'react';
+import { Router, Route } from 'react-router-dom';
 import {MyMenu, Navigation} from './components/menu';
 import {Home} from './components/Home';
 import {Test} from './components/test';
-import {Onestop_Dashboard} from './components/Onestop_Dashboard';
+import {OS_Dashboard} from './components/OneStop';
 import {JobViewer} from './components/Jobviewer';
 import {ShowLog} from './components/showlog';
-
-import { createHashHistory } from 'history';
-
+import {CustomObject} from './components/CustomObject';
+import {PMUsers} from './components/PMUsers';
+import {Logout} from './components/logout';
+import history from './history';
 import PropTypes from 'prop-types';
 
-export const history = createHashHistory();
-
 const Main = () => (
-  <Router>
+  <Router history={history}>
     <div className="Main">
     <Navigation />
 
       <div>
       <MyMenu/>
-
       <PrivateRoute path="/Home" component={Home} />
       <Route exact path="/test" component={Test}/>
-      <PrivateRoute exact path="/Onestop_Dashboard" component={Onestop_Dashboard}/>
+      <PrivateRoute exact path="/OS_Dashboard" component={OS_Dashboard}/>
       <PrivateRoute exact path="/JobViewer" component={JobViewer}/>
       <PrivateRoute exact path="/showlog" component={ShowLog}/>
+      <PrivateRoute exact path="/CustomObject" component={CustomObject}/>
+      <PrivateRoute exact path="/pmusers" component={PMUsers}/>
+      <Route exact path ="/logout" component={Logout} />
 
       </div>
     </div>

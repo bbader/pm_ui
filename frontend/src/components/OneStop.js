@@ -3,11 +3,13 @@ import axios from 'axios';
 import styled from 'styled-components';
 import * as Table from 'reactabular-table';
 import { Column, Row } from 'simple-flexbox';
+import history from '../history';
 
 const AlignedBodyCell = styled.td`
   text-align: ${props => props.isNumber ? 'right' : 'left'};
 `;
-export class Onestop_Dashboard extends React.Component {
+
+export class OS_Dashboard extends React.Component {
     constructor(props) {
       super(props);
 
@@ -39,7 +41,6 @@ export class Onestop_Dashboard extends React.Component {
         diskrows: [],
         usercols: this.getUserCols(),
         userrows: []
-
       };
     }
 
@@ -127,8 +128,9 @@ componentDidMount() {
   })
   .catch(function (error) {
     if (error.response) {
-      console.log(error.response);
+      // console.log(error.response);
       alert(error.response.data.message);
+      history.push( '/logout' );
     }
   })
     .then(res => {
@@ -445,3 +447,76 @@ renderRowData(data) {
     );
   }
 }
+
+export class OS_Processes extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    return(
+      <div></div>
+    );
+  }
+}
+
+export class OS_Network extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    return(
+      <div></div>
+    );
+  }
+}
+
+export class OS_Disks extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    return(
+      <div></div>
+    );
+  }
+}
+
+export class OS_Logs extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    return(
+      <div></div>
+    );
+  }
+}
+
+export class OS_Oracle extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    return(
+      <div></div>
+    );
+  }
+}
+
+export class OS_Admin extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    return(
+      <div></div>
+    );
+  }
+}
+

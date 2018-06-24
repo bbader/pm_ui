@@ -1,6 +1,6 @@
+
+
 import React from 'react';
-import '../project.css';
-import { slide as Menu } from 'react-burger-menu';
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import faHome from '@fortawesome/fontawesome-free-solid/faHome';
 import faDatabase from '@fortawesome/fontawesome-free-solid/faDatabase';
@@ -8,12 +8,19 @@ import faDollar from '@fortawesome/fontawesome-free-solid/faDollarSign';
 import faTable from '@fortawesome/fontawesome-free-solid/faTable';
 import faDesktop from '@fortawesome/fontawesome-free-solid/faDesktop';
 import faWrench from '@fortawesome/fontawesome-free-solid/faWrench';
+import faClipboard from '@fortawesome/fontawesome-free-solid/faClipboard';
+import faToolbox from '@fortawesome/fontawesome-free-solid/faToolbox';
+import faMicrochip from '@fortawesome/fontawesome-free-solid/faMicrochip';
+import faEye from '@fortawesome/fontawesome-free-solid/faEye';
+import faSitemap from '@fortawesome/fontawesome-free-solid/faSitemap';
+import faHdd from '@fortawesome/fontawesome-free-solid/faHdd';
+import faFile from '@fortawesome/fontawesome-free-solid/faFile';
+import faUserSecret from '@fortawesome/fontawesome-free-solid/faUserSecret';
 import logo from '../images/CHC_Logo_144x68.jpg';
 import axios from 'axios';
 import { myConfig } from '../config';
-import { createHashHistory } from 'history';
+import history from '../history';
 import PropTypes from 'prop-types';
-
 import bcrypt from 'bcryptjs';
 import jwt from'jsonwebtoken';
 
@@ -21,50 +28,13 @@ import {
   Navbar,
   NavbarToggler,
   NavbarBrand,
-  Button, Modal, ModalFooter, Form, FormGroup, Label, Input, Col 
+  Button, Modal, ModalFooter, Form, FormGroup, Label, Input, Col,
+  Nav, NavItem, Dropdown, DropdownItem, DropdownToggle, DropdownMenu, UncontrolledButtonDropdown
 } from 'reactstrap';
 
 import {
   NavLink,
 } from 'react-router-dom';
-
-export const history = createHashHistory();
-
-var styles = {
-    bmBurgerButton: {
-      position: 'fixed',
-      width: '36px',
-      height: '30px',
-      left: '36px',
-      top: '100px'
-    },
-    bmBurgerBars: {
-      background: 'green'
-    },
-    bmCrossButton: {
-      height: '24px',
-      width: '24px'
-    },
-    bmCross: {
-      background: '#bdc3c7'
-    },
-    bmMenu: {
-      background: '#373a47',
-      paddingTop: 30,
-      fontSize: '1.0em',
-      textAlign: 'left'
-    },
-    bmMorphShape: {
-      fill: '#373a47'
-    },
-    bmItemList: {
-      color: '#b8b7ad',
-      padding: '0.8em'
-    },
-    bmOverlay: {
-      background: 'rgba(0, 0, 0, 0.3)'
-    }
-  };
 
 export class Navigation extends React.Component {
   constructor(props) {
@@ -78,6 +48,7 @@ export class Navigation extends React.Component {
     this.toggle = this.toggle.bind(this);
     this.doAuth = this.doAuth.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.logout = this.logout.bind(this);
   }
 
   toggle() {
@@ -87,8 +58,7 @@ export class Navigation extends React.Component {
   }
 
   logout() {
-    sessionStorage.removeItem('token');
-    sessionStorage.setItem('isAuthenticated', false);
+    history.push( '/logout' );
   }
 
   handleChange(e) {
@@ -108,6 +78,7 @@ export class Navigation extends React.Component {
       token: []
     };
 
+    var tmpthis = this;
     axios({
       method:'post',
       url: myConfig.base_url + '/api/logins',
@@ -115,8 +86,9 @@ export class Navigation extends React.Component {
     })
       .catch(function (error) {
         if (error.response) {
-          console.log(error.response);
-          alert(error.response.data.message);
+          // console.log(error.response);
+          alert('ERROR: ' + error.response.data.message);
+          return;
         }
       })
       .then(res => {
@@ -129,10 +101,12 @@ export class Navigation extends React.Component {
 
             if (err) {
               alert('ERROR: Something wong!');
+              return;
             }
 
             if (!pwMatch) {
               alert('ERROR: Invalid username or password!');
+              return;
             }
 
             payload = {
@@ -145,11 +119,10 @@ export class Navigation extends React.Component {
 
             sessionStorage.setItem('token', user.token);
             sessionStorage.setItem('isAuthenticated', true);
-            history.push({
-              pathname: '/'
-            });
+            tmpthis.setState({isLoggedIn: true});
+            history.push( '/Home' );
 
-          });
+            });
           })
         .catch(err => console.log(err)
     );
@@ -165,7 +138,7 @@ export class Navigation extends React.Component {
           <NavbarToggler onClick={this.toggle} />
 
           <div>
-            <Button size="sm" color="link" onClick={this.toggle}>Login</Button>
+            <Button size="sm" color="link" onClick={this.toggle}>  {JSON.parse(sessionStorage.getItem('isAuthenticated'))  ? ' ' : 'Login'}   </Button>
             <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
             <Form>
             <FormGroup row>
@@ -182,12 +155,13 @@ export class Navigation extends React.Component {
             </FormGroup>                
             <ModalFooter>
               <Button color="link" onClick={this.toggle}>Cancel</Button>
-              <Button color="link" onClick={this.doAuth}>Login</Button>
+              <Button color="link" type='submit' onClick={this.doAuth}>Login</Button>
             </ModalFooter>
             </Form> 
             </Modal>
       
             <Button size="sm" color="link" onClick={this.logout}>Logout</Button>
+            {/* <NavLink className="btn btn-sm" to="/logout"> Logout </NavLink> */}
           </div>
         </Navbar>
       );
@@ -195,135 +169,137 @@ export class Navigation extends React.Component {
   }
   
   Navigation.propTypes = {
-  className: PropTypes.object.isRequired
+  className: PropTypes.object.isRequired,
 };
-  
+
 
 export class MyMenu extends React.Component {
   constructor (props) {
     super(props);
     this.state = {
-      menuOpen: false
+      menuOpen: false,
+      dropdownOpen: false,
+      osdropdownOpen: false
     };
+
+    this.toggle = this.toggle.bind(this);
+    this.toggleos = this.toggleos.bind(this);
   }
 
-    showSettings (event) {
-      event.preventDefault();
-    }
+  toggleos() {
+    this.setState({
+      osdropdownOpen: !this.state.osdropdownOpen
+    });
+  }
 
-    handleStateChange (state) {
-      this.setState({menuOpen: state.isOpen});  
-    }
+  toggle() {
+    this.setState({
+      dropdownOpen: !this.state.dropdownOpen
+    });
+  }
 
-    closeMenu () {
-      this.setState({menuOpen: false});
-    }
+  closeMenu () {
+    this.setState({dropdownOpen: false});
+  }
 
-    toggleMenu () {
-      this.setState({menuOpen: !this.state.menuOpen});
-    }
-  
-    render () {
-      return (
-        <Menu styles={ styles } isOpen={this.state.menuOpen} onStateChange={(state) => this.handleStateChange(state)}>
+  render () {
+    return (
+      <div>
+        <Nav pills>
+          <NavItem>
+            <NavLink className="nav-link" to="/Home">  <FontAwesomeIcon icon={faHome}/> Home  </NavLink> 
+          </NavItem>
 
-            {/* NOTE:  When adding to menus if you have a dropdown in the list then you need to group all dropdowns towards
-              the bottom of the list.  Single items should come first.  This has to do with the way the menu opens and 
-              closes on hover.  */}
-          <div className="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul className="navbar-nav mr-auto">
+          <UncontrolledButtonDropdown>
+            <DropdownToggle nav caret >
+              <FontAwesomeIcon icon={faDatabase}/> Data Integration
+            </DropdownToggle>
+            <DropdownMenu>
+              <DropdownItem header>Header</DropdownItem>
+              <DropdownItem disabled>Action</DropdownItem>
+              <DropdownItem>Another Action</DropdownItem>
+              <DropdownItem divider />
+              <DropdownItem>Another Action</DropdownItem>
+            </DropdownMenu>
+          </UncontrolledButtonDropdown>
 
-              <li className="nav-item ">
-                <NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/Home">  <FontAwesomeIcon icon={faHome}/> Home  </NavLink> 
-              </li>
+          <UncontrolledButtonDropdown>
+            <DropdownToggle nav caret>
+              <FontAwesomeIcon icon={faDollar}/> Business Logic
+            </DropdownToggle>
+            <DropdownMenu>
+              <DropdownItem header>Header</DropdownItem>
+              <DropdownItem disabled>Action</DropdownItem>
+              <DropdownItem>Another Action</DropdownItem>
+              <DropdownItem divider />
+              <DropdownItem>Another Action</DropdownItem>
+            </DropdownMenu>
+          </UncontrolledButtonDropdown>
 
-              {/* Data Integration */}
-              <li className="nav-item dropdown">
-                  <button className="dropdown-toggle"> <FontAwesomeIcon icon={faDatabase}/> Data Integration  </button>
+          <UncontrolledButtonDropdown>
+            <DropdownToggle nav caret>
+              <FontAwesomeIcon icon={faTable}/> Presentation
+            </DropdownToggle>
+            <DropdownMenu>
+              <DropdownItem header>Header</DropdownItem>
+              <DropdownItem disabled>Action</DropdownItem>
+              <DropdownItem>Another Action</DropdownItem>
+              <DropdownItem divider />
+              <DropdownItem>Another Action</DropdownItem>
+            </DropdownMenu>
+          </UncontrolledButtonDropdown>
 
-                  <div className="dropdown-menu" aria-labelledby="navbarDropdown">
-                      <NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/test"> Test  </NavLink> 
+          <UncontrolledButtonDropdown>
+            <DropdownToggle nav caret>
+              <FontAwesomeIcon icon={faDesktop}/> System Administration
+            </DropdownToggle>
+            <DropdownMenu>
+              <DropdownItem header>Header</DropdownItem>
+              <DropdownItem disabled>Action</DropdownItem>
+              <DropdownItem>Another Action</DropdownItem>
+              <DropdownItem divider />
+              <DropdownItem>Another Action</DropdownItem>
+            </DropdownMenu>
+          </UncontrolledButtonDropdown>
 
-                    <li className="nav-item dropdown">
-                      <button className="dropdown-toggle"> Button </button>
-                        <div className="dropdown-menu" aria-labelledby="navbarDropdown">
-                          <a className="dropdown-item" href="/">Action2</a>
-                          <a className="dropdown-item" href="/">Action3</a>
-                          <a className="dropdown-item" href="/">Action4</a>
-                        </div>
-                    </li>
-                        {/* Example of divider and another link */}
-                        {/* <div className="dropdown-divider"></div>*/}
+          <Dropdown nav isOpen={this.state.dropdownOpen} toggle={this.toggle}>
+            <DropdownToggle nav caret>
+              <FontAwesomeIcon icon={faWrench}/> Utilities
+            </DropdownToggle>
+            <DropdownMenu>
+              <DropdownItem><NavLink  className="nav-link dropdown-item" to="/Jobviewer"> <FontAwesomeIcon icon={faEye}/> Job Viewer  </NavLink> </DropdownItem>
+              <DropdownItem divider />
 
-                        {/* <a className="dropdown-item" href="/">Something else here</a> */}
+              <Dropdown nav isOpen={this.state.osdropdownOpen} toggle={this.toggleos} >
+                <DropdownToggle nav caret>
+                  <FontAwesomeIcon icon={faToolbox}/> OneStop
+                </DropdownToggle>
 
-                    <li className="nav-item dropdown">
-                      <button className="dropdown-toggle"> Button </button>
-                        <div className="dropdown-menu" aria-labelledby="navbarDropdown">
-                          <a className="dropdown-item" href="/">Action2</a>
-                          <a className="dropdown-item" href="/">Action3</a>
-                          <a className="dropdown-item" href="/">Action4</a>
-                        </div>
-                    </li>
+                  <DropdownMenu>
+                    <DropdownItem><NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/OS_Dashboard" > <FontAwesomeIcon icon={faClipboard}/> Dashboard  </NavLink> </DropdownItem>
+                    <DropdownItem><NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/OS_Processes" > <FontAwesomeIcon icon={faMicrochip}/> Processes  </NavLink> </DropdownItem>
+                    <DropdownItem><NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/OS_Network" > <FontAwesomeIcon icon={faSitemap}/> Network  </NavLink> </DropdownItem>
+                    <DropdownItem><NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/OS_Disks" > <FontAwesomeIcon icon={faHdd}/> Disks  </NavLink> </DropdownItem>
+                    <DropdownItem><NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/OS_Logs" > <FontAwesomeIcon icon={faFile}/> Logs  </NavLink> </DropdownItem>
+                    <DropdownItem><NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/OS_Oracle" > <FontAwesomeIcon icon={faDatabase}/> Oracle  </NavLink> </DropdownItem>
+                    <DropdownItem><NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/OS_Admin" > <FontAwesomeIcon icon={faUserSecret}/> Admin  </NavLink> </DropdownItem>
+                  </DropdownMenu>
+              </Dropdown>
 
-                  </div>
-              </li>
+              <DropdownItem divider />
+              <DropdownItem><NavLink  className="nav-link dropdown-item" to="/CustomObject"> <FontAwesomeIcon icon={faWrench}/> Custom Object  </NavLink> </DropdownItem>
+              <DropdownItem><NavLink  className="nav-link dropdown-item" to="/pmusers"> <FontAwesomeIcon icon={faWrench}/> Show PM Users  </NavLink> </DropdownItem>
 
-              {/* Business Logic */}
-              <li className="nav-item dropdown">
-                <button className="dropdown-toggle"> <FontAwesomeIcon icon={faDollar}/> Business Logic  </button>
-                  <div className="dropdown-menu" aria-labelledby="navbarDropdown">
-
-                  </div>
-              </li>
-
-              {/* <!-- Presentation -->  */}
-              <li className="nav-item dropdown">
-                <button className="dropdown-toggle"> <FontAwesomeIcon icon={faTable}/> Presentation  </button>
-                  <div className="dropdown-menu" aria-labelledby="navbarDropdown">
-
-                  </div>
-              </li>
-
-              {/* System Administration */}
-              <li className="nav-item dropdown">
-                <button className="dropdown-toggle"> <FontAwesomeIcon icon={faDesktop}/> System Administration  </button>
-                  <div className="dropdown-menu" aria-labelledby="navbarDropdown">
-
-                  </div>
-              </li>
-
-              {/* Utilities Menu */}
-                <li className="nav-item dropdown">
-                  <button className="dropdown-toggle"> <FontAwesomeIcon icon={faWrench}/> Utilities  </button>
-                    <div className="dropdown-menu" aria-labelledby="navbarDropdown">
-
-                      <NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/Jobviewer">  Job Viewer  </NavLink> 
-
-
-                      <li className="nav-item dropdown">
-                        <button className="dropdown-toggle nav-link">  OneStop  </button>
-                          <div className="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/Onestop_Dashboard">  Dashboard  </NavLink> 
-                            <a className="dropdown-item" href="/">Processes</a>
-                            <a className="dropdown-item" href="/">Network</a>
-                            <a className="dropdown-item" href="/">Disks</a>
-                            <a className="dropdown-item" href="/">Logs</a>
-                            <a className="dropdown-item" href="/">Oracle</a>
-                            <a className="dropdown-item" href="/">Admin</a>
-                          </div>
-                      </li>
-                    </div>
-                  </li>
-
-              {/* Example of disabled */}
-              {/* <li className="nav-item">
-                <a className="nav-link disabled" href="/">Disabled</a>
-              </li> */}
-
-            </ul>
-          </div>      
-        </Menu>
+            </DropdownMenu>
+          </Dropdown>
+        
+          <NavItem>
+          <NavLink  className="nav-link " to="/test"> Test  </NavLink> 
+          </NavItem>
+        </Nav>
+      </div>
       );
-    }
+    }  
   }
+
+

@@ -2,9 +2,7 @@
 import React from 'react';
 import axios from 'axios';
 import { compose } from 'redux';
-import {
-  cloneDeep, findIndex, orderBy
-} from 'lodash';
+import { cloneDeep, findIndex, orderBy } from 'lodash';
 import * as Table from 'reactabular-table';
 import * as search from 'searchtabular';
 import * as sort from 'sortabular';
@@ -13,13 +11,9 @@ import * as resolve from 'table-resolver';
 import VisibilityToggles from 'react-visibility-toggles';
 import * as tree from 'treetabular';
 import ReactModal from 'react-modal';
-import PropTypes from 'prop-types';
-
-import {
-  Paginator, PrimaryControls, paginate
-} from '../helpers';
-
+import { Paginator, PrimaryControls, paginate } from '../helpers';
 import { myConfig } from '../config';
+import history from '../history';
 
 const customStyles = {
   content : {
@@ -36,7 +30,6 @@ const customStyles = {
 ReactModal.setAppElement('body');
 
 export class JobViewer extends React.Component {
-
     constructor(props) {
     super(props);
     
@@ -54,10 +47,10 @@ export class JobViewer extends React.Component {
       },
 
       title: 'PopUp Menu',
-  showOk: true,
-  okText: 'OK',
-  okDisabled: false,
-  link: null
+      showOk: true,
+      okText: 'OK',
+      okDisabled: false,
+      link: null
 
     };
 
@@ -77,8 +70,14 @@ componentDidMount() {
   axios({
     method:'get',
     url: myConfig.base_url + '/utilities/jobViewer/fe',
-    headers: { 'x-access-token': sessionStorage.getItem('token') }
-
+    headers: { 'authorization': sessionStorage.getItem('token'), }
+  })
+  .catch(function (error) {
+    if (error.response) {
+      console.log(error.response.status);
+      alert(error.response.data.message);
+      history.push( '/logout' );
+    }
   })
     .then(res => {
       let rows = this.renderRowData(res.data.sqlResult);
@@ -668,12 +667,10 @@ return [
 
         </ul>
 
-
         <button className='btn-sm btn-info' onClick={this.handleCloseModal}>Close</button>
 
         </ReactModal>
 
- 
         </Table.Provider>
 
         <div className="controls">
@@ -684,35 +681,12 @@ return [
           />
         </div>
 
-        {/* <VisibilityToggles
-          columns={columns}
-          onToggleColumn={this.onToggleColumn}
-        />
-
-        <Table.Provider
-          className="pure-table pure-table-striped"
-          columns = { resolvedColumns }   >
-
-          <Table.Header headerRows={resolve.headerRows({ columns })} >
-            <search.Columns
-              query={query}
-              columns={ resolvedColumns }
-              onChange={query => this.setState({ query })} />
-          </Table.Header>
-
-          <Table.Body rows={searchedRows} rowKey="id" />
-        </Table.Provider> */}
-
-        {/* {this.state.sqlMetadata.map( (res) => (
-        <li key={res.name}> {res.name} </li>))} */}
-
-        {/* {this.state.currentTime }; */}
       </div>
     );
   }
 
   openLog(link) {
-    this.props.history.push( {
+    history.push( {
       pathname: 'showlog',
       link: link
       });
@@ -781,11 +755,6 @@ return [
   }
 
 }
-
-JobViewer.propTypes = {
-  history: PropTypes.object.isRequired
-};
-
 
 function sortHeader(sortable, getSortingColumns) {
   return (value, { columnIndex }) => {

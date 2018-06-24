@@ -1,3 +1,5 @@
+
+
 import React from 'react';
 import axios from 'axios';
 import PropTypes from 'prop-types'
@@ -18,7 +20,8 @@ export class ShowLog extends React.Component {
   componentDidMount() {
     axios({
       method:'get',
-      url: this.props.location.link
+      url: this.props.location.link,
+      headers: { 'authorization': sessionStorage.getItem('token'), }
     })
       .then(res => {
         let log = res.data;

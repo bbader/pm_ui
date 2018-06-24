@@ -37,11 +37,11 @@ app.get("/", function(req, res){
     res.render("index");
 });
 
-// app.use("/utilities/onestop", auth(), onestopRoutes);
-app.use("/utilities/onestop", onestopRoutes);
+app.use("/utilities/onestop", auth(), onestopRoutes);
+// app.use("/utilities/onestop", onestopRoutes);
 
 
-app.use("/utilities", utilitiesRoutes);
+app.use("/utilities", auth(), utilitiesRoutes);
 
 router = express.Router();
 router.post("/users",  users.post);
