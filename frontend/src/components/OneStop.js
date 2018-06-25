@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import * as Table from 'reactabular-table';
 import { Column, Row } from 'simple-flexbox';
 import history from '../history';
+import {getData} from './dataService';
 
 const AlignedBodyCell = styled.td`
   text-align: ${props => props.isNumber ? 'right' : 'left'};
@@ -451,11 +452,18 @@ renderRowData(data) {
 export class OS_Processes extends React.Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      columns: [],
+      rows: []
+    };
   }
 
   render() {
     return(
-      <div></div>
+      <div>
+
+      </div>
     );
   }
 }
@@ -463,6 +471,11 @@ export class OS_Processes extends React.Component {
 export class OS_Network extends React.Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      columns: [],
+      rows: []
+    };
   }
 
   render() {
@@ -475,6 +488,11 @@ export class OS_Network extends React.Component {
 export class OS_Disks extends React.Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      columns: [],
+      rows: []
+    };
   }
 
   render() {
@@ -487,6 +505,11 @@ export class OS_Disks extends React.Component {
 export class OS_Logs extends React.Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      columns: [],
+      rows: []
+    };
   }
 
   render() {
@@ -496,9 +519,365 @@ export class OS_Logs extends React.Component {
   }
 }
 
-export class OS_Oracle extends React.Component {
+export class OS_oracleTableSpace extends React.Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      columns: this.getColumns(),
+      rows: []
+    };
+  }
+
+  getColumns() {
+    return [
+      { property: 'Tablespace', header: { label: 'Tablespace' } },
+      { property: 'Size (MB)', header: { label: 'Size (MB)' } },
+      { property: 'Free (MB)', header: { label: 'Free (MB)' } },
+      { property: '% Free', header: { label: '% Free' } },
+      { property: '% Used', header: { label: '% Used' } }
+    ];
+  }
+
+  componentDidMount() {
+    axios({
+      method:'get',
+      url:'http://10.211.55.253:3000/utilities/onestop/oracleTableSpace',
+      headers: { 'authorization': sessionStorage.getItem('token'),
+     }
+    })
+    .catch(function (error) {
+      if (error.response) {
+        // console.log(error.response);
+        alert(error.response.data.message);
+        history.push( '/logout' );
+      }
+    })
+      .then(res => {
+        this.renderRowData(res.data.rows);
+        })
+      .catch(err => console.log(err));
+  }
+  
+  renderRowData(data) {
+    var userrowData = [];
+    var userrow = {
+      id: '',
+      Tablespace: '',
+      'Size (MB)': '',
+      'Free (MB)': '',
+      '% Free': '',
+      '% Used': ''
+    };
+  
+    for (let i = 0; i < data.length; i++){
+      let row = data[i];
+  
+      userrow = {
+        id: i,
+        Tablespace: row.Tablespace,
+        'Size (MB)': row['Size (MB)'],
+        'Free (MB)': row['Free (MB)'],
+        '% Free': row['% Free'],
+        '% Used': row['% Used']
+      };
+      userrowData.push(userrow);
+    }
+    let rows = userrowData;
+    this.setState({rows});  
+  }
+
+  render() {
+    const { columns, rows } = this.state;
+
+    const stylingRenderers = {
+      body: {
+        cell: AlignedBodyCell // the one element we are overriding
+      }
+    };
+
+    return(
+      <div>
+        <br/>
+          <Column flexGrow={1}>
+          <Row horizontal='center'>
+            <Table.Provider
+              className="pure-table pure-table-striped"
+              columns = {columns }
+              renderers={stylingRenderers}
+              style={{ width: 700 }}   >
+
+            <Table.Header ></Table.Header>
+          
+            <Table.Body rows={ rows} rowKey="id" />
+            </Table.Provider>
+            </Row>
+          </Column>
+      </div>
+    );
+  }
+}
+
+export class OS_oracleParameters extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      columns: this.getColumns(),
+      rows: [], 
+      data: null
+    };
+  }
+
+  getColumns() {
+    return [
+      { property: 'NAME', header: { label: 'Name' } },
+      { property: 'TYPE', header: { label: 'Type' } },
+      { property: 'VALUE', header: { label: 'Value' } }
+    ];
+  }
+
+  componentDidMount() {
+    if (!this.state.data) {
+      getData('http://10.211.55.253:3000/utilities/onestop/oracleParameters')
+      .then(data => this.setState({data}))
+      .catch(err => { /*...handle the error...*/});
+    }
+  
+    // TRY thisexport function fetchData(ajaxUrl, postParams) {
+    //   const params = new URLSearchParams()
+    //   _.forEach(postParams, (value, key) => {
+    //     params.append(key, value)
+    //   })
+    
+    //   return axios.post(ajaxUrl, params) // return here
+    //       .then(response => response.data)
+    //       .catch(error => error)
+    // }
+    // and the calling block:
+    
+    // fetchData(ajaxUrl, postParams)
+    //   .then((response) => {
+    //     this.myCallbackFunction(response)
+    //   })
+    //   .catch(error => error)
+
+    // if (!this.state.data) {
+    //     (async () => {
+    //         try {
+    //           this.setState({data: await getData('http://10.211.55.253:3000/utilities/onestop/oracleParameters') });
+    //             console.log("BOB" + this.state.data);
+    //             this.renderRowData(this.state.data );    
+  
+    //         } catch (e) {
+    //             //...handle the error...
+    //         }
+    //     })();
+    // }
+
+}
+  // componentDidMount() {
+    // axios({
+    //   method:'get',
+    //   url:'http://10.211.55.253:3000/utilities/onestop/oracleParameters',
+    //   headers: { 'authorization': sessionStorage.getItem('token') }
+    // })
+    // .catch(function (error) {
+    //   if (error.response) {
+    //     // console.log(error.response);
+    //     alert(error.response.data.message);
+    //     history.push( '/logout' );
+    //   }
+    // })
+    //   .then(res => {
+    //     this.renderRowData(res.data.rows);
+    //     })
+    //   .catch(err => console.log(err));
+  // }
+  
+  renderRowData(data) {
+    var userrowData = [];
+    var userrow = {
+      id: '',
+      NAME: '',
+      TYPE: '',
+      VALUE: ''
+    };
+          console.log(data);
+
+    for (let i = 0; i < data.length; i++){
+      let row = data[i];
+  
+      userrow = {
+        id: i,
+        NAME: row.NAME,
+        TYPE: row.TYPE,
+        VALUE: row.VALUE
+      };
+      userrowData.push(userrow);
+    }
+    let rows = userrowData;
+    this.setState({rows});  
+  }
+
+  render() {
+    const { columns, rows } = this.state;
+
+    const stylingRenderers = {
+      body: {
+        cell: AlignedBodyCell // the one element we are overriding
+      }
+    };
+
+    return(
+      <div>
+        <br/>
+        <Column flexGrow={1}>
+        <Row horizontal='center'>
+        <Table.Provider
+          className="pure-table pure-table-striped"
+          columns = {columns }
+          renderers={stylingRenderers}
+          style={{ width: 700 }}   >
+
+          <Table.Header ></Table.Header>
+          
+          <Table.Body rows={ rows} rowKey="id" />
+          </Table.Provider>
+          </Row>
+        </Column>
+      </div>
+    );
+  }
+}
+
+export class OS_oracleLongRunning extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      columns: [],
+      rows: []
+    };
+  }
+
+  render() {
+    return(
+      <div></div>
+    );
+  }
+}
+
+export class OS_oracleQueryReservation extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      columns: [],
+      rows: []
+    };
+  }
+
+  render() {
+    return(
+      <div></div>
+    );
+  }
+}
+
+export class OS_oracleGetAppliedRounds extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      columns: [],
+      rows: []
+    };
+  }
+
+  render() {
+    return(
+      <div></div>
+    );
+  }
+}
+
+export class OS_oraclecheckRounds extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      columns: [],
+      rows: []
+    };
+  }
+
+  render() {
+    return(
+      <div></div>
+    );
+  }
+}
+
+export class OS_oraclecheckMaxProcesses extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      columns: [],
+      rows: []
+    };
+  }
+
+  render() {
+    return(
+      <div></div>
+    );
+  }
+}
+
+export class OS_oraclecheckGRStatus extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      columns: [],
+      rows: []
+    };
+  }
+
+  render() {
+    return(
+      <div></div>
+    );
+  }
+}
+
+export class OS_oraclecheckLocks extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      columns: [],
+      rows: []
+    };
+  }
+
+  render() {
+    return(
+      <div></div>
+    );
+  }
+}
+
+export class OS_oraclecheckActivity extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      columns: [],
+      rows: []
+    };
   }
 
   render() {
@@ -511,6 +890,11 @@ export class OS_Oracle extends React.Component {
 export class OS_Admin extends React.Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      columns: [],
+      rows: []
+    };
   }
 
   render() {

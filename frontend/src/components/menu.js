@@ -179,16 +179,24 @@ export class MyMenu extends React.Component {
     this.state = {
       menuOpen: false,
       dropdownOpen: false,
-      osdropdownOpen: false
+      osdropdownOpen: false,
+      osoracledropdownOpen: false
     };
 
     this.toggle = this.toggle.bind(this);
     this.toggleos = this.toggleos.bind(this);
+    this.toggleosoracle = this.toggleosoracle.bind(this);
   }
 
   toggleos() {
     this.setState({
       osdropdownOpen: !this.state.osdropdownOpen
+    });
+  }
+
+  toggleosoracle() {
+    this.setState({
+      osoracledropdownOpen: !this.state.osoracledropdownOpen
     });
   }
 
@@ -200,6 +208,8 @@ export class MyMenu extends React.Component {
 
   closeMenu () {
     this.setState({dropdownOpen: false});
+    this.setState({osdropdownOpen: false});
+    this.setState({osoracledropdownOpen: false});
   }
 
   render () {
@@ -268,31 +278,39 @@ export class MyMenu extends React.Component {
             </DropdownToggle>
             <DropdownMenu>
               <DropdownItem><NavLink  className="nav-link dropdown-item" to="/Jobviewer"> <FontAwesomeIcon icon={faEye}/> Job Viewer  </NavLink> </DropdownItem>
-              <DropdownItem divider />
-
-              <Dropdown nav isOpen={this.state.osdropdownOpen} toggle={this.toggleos} >
-                <DropdownToggle nav caret>
-                  <FontAwesomeIcon icon={faToolbox}/> OneStop
-                </DropdownToggle>
-
-                  <DropdownMenu>
-                    <DropdownItem><NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/OS_Dashboard" > <FontAwesomeIcon icon={faClipboard}/> Dashboard  </NavLink> </DropdownItem>
-                    <DropdownItem><NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/OS_Processes" > <FontAwesomeIcon icon={faMicrochip}/> Processes  </NavLink> </DropdownItem>
-                    <DropdownItem><NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/OS_Network" > <FontAwesomeIcon icon={faSitemap}/> Network  </NavLink> </DropdownItem>
-                    <DropdownItem><NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/OS_Disks" > <FontAwesomeIcon icon={faHdd}/> Disks  </NavLink> </DropdownItem>
-                    <DropdownItem><NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/OS_Logs" > <FontAwesomeIcon icon={faFile}/> Logs  </NavLink> </DropdownItem>
-                    <DropdownItem><NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/OS_Oracle" > <FontAwesomeIcon icon={faDatabase}/> Oracle  </NavLink> </DropdownItem>
-                    <DropdownItem><NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/OS_Admin" > <FontAwesomeIcon icon={faUserSecret}/> Admin  </NavLink> </DropdownItem>
-                  </DropdownMenu>
-              </Dropdown>
-
-              <DropdownItem divider />
               <DropdownItem><NavLink  className="nav-link dropdown-item" to="/CustomObject"> <FontAwesomeIcon icon={faWrench}/> Custom Object  </NavLink> </DropdownItem>
               <DropdownItem><NavLink  className="nav-link dropdown-item" to="/pmusers"> <FontAwesomeIcon icon={faWrench}/> Show PM Users  </NavLink> </DropdownItem>
-
             </DropdownMenu>
           </Dropdown>
         
+          <Dropdown nav isOpen={this.state.osdropdownOpen} toggle={this.toggleos}>
+            <DropdownToggle nav caret> <FontAwesomeIcon icon={faToolbox}/> OneStop </DropdownToggle>
+              <DropdownMenu>
+                <DropdownItem><NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/OS_Dashboard" > <FontAwesomeIcon icon={faClipboard}/> Dashboard  </NavLink> </DropdownItem>
+                <DropdownItem><NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/OS_Processes" > <FontAwesomeIcon icon={faMicrochip}/> Processes  </NavLink> </DropdownItem>
+                <DropdownItem><NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/OS_Network" > <FontAwesomeIcon icon={faSitemap}/> Network  </NavLink> </DropdownItem>
+                <DropdownItem><NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/OS_Disks" > <FontAwesomeIcon icon={faHdd}/> Disks  </NavLink> </DropdownItem>
+                <DropdownItem><NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/OS_Logs" > <FontAwesomeIcon icon={faFile}/> Logs  </NavLink> </DropdownItem>
+                <Dropdown nav isOpen={this.state.osoracledropdownOpen} toggle={this.toggleosoracle}>
+                  <DropdownToggle nav caret> <FontAwesomeIcon icon={faDatabase}/> Oracle </DropdownToggle>
+                  <DropdownMenu>
+                    <DropdownItem><NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/OS_oracleTableSpace" > <FontAwesomeIcon icon={faDatabase}/> Check Table Space  </NavLink> </DropdownItem>
+                    <DropdownItem><NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/OS_oracleParameters" > <FontAwesomeIcon icon={faDatabase}/> Check Oracle Parameters  </NavLink> </DropdownItem>
+                    <DropdownItem><NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/OS_oracleLongRunning" > <FontAwesomeIcon icon={faDatabase}/> Check for Long Running Queries  </NavLink> </DropdownItem>
+                    <DropdownItem><NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/OS_oracleQueryReservation" > <FontAwesomeIcon icon={faDatabase}/> Query Reservation Table  </NavLink> </DropdownItem>
+                    <DropdownItem><NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/OS_oracleGetAppliedRounds" > <FontAwesomeIcon icon={faDatabase}/> Check Applied Rounds  </NavLink> </DropdownItem>
+                    <DropdownItem><NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/OS_oraclecheckRounds" > <FontAwesomeIcon icon={faDatabase}/> Check Rounds  </NavLink> </DropdownItem>
+                    <DropdownItem><NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/OS_oraclecheckMaxProcesses" > <FontAwesomeIcon icon={faDatabase}/> Check Max Processes  </NavLink> </DropdownItem>
+                    <DropdownItem><NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/OS_oraclecheckGRStatus" > <FontAwesomeIcon icon={faDatabase}/> Check Grouping and Reimbursement Status  </NavLink> </DropdownItem>
+                    <DropdownItem><NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/OS_oraclecheckLocks" > <FontAwesomeIcon icon={faDatabase}/> Check Oracle Locks  </NavLink> </DropdownItem>
+                    <DropdownItem><NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/OS_oraclecheckActivity" > <FontAwesomeIcon icon={faDatabase}/> Check Oracle Activity  </NavLink> </DropdownItem>
+                  </DropdownMenu>
+                </Dropdown>
+
+                <DropdownItem><NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/OS_Admin" > <FontAwesomeIcon icon={faUserSecret}/> Admin  </NavLink> </DropdownItem>
+              </DropdownMenu>
+          </Dropdown>
+
           <NavItem>
           <NavLink  className="nav-link " to="/test"> Test  </NavLink> 
           </NavItem>

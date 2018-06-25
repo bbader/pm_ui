@@ -37,8 +37,8 @@ app.get("/", function(req, res){
     res.render("index");
 });
 
-app.use("/utilities/onestop", auth(), onestopRoutes);
-// app.use("/utilities/onestop", onestopRoutes);
+// app.use("/utilities/onestop", auth(), onestopRoutes);
+app.use("/utilities/onestop", onestopRoutes);
 
 
 app.use("/utilities", auth(), utilitiesRoutes);
