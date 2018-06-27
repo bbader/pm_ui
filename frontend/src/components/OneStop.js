@@ -1,10 +1,9 @@
 import React from 'react';
-import axios from 'axios';
 import styled from 'styled-components';
 import * as Table from 'reactabular-table';
 import { Column, Row } from 'simple-flexbox';
-import history from '../history';
-import {getData} from './dataService';
+import { myConfig } from '../config';
+import { getDataAPI } from './api';
 
 const AlignedBodyCell = styled.td`
   text-align: ${props => props.isNumber ? 'right' : 'left'};
@@ -120,21 +119,11 @@ export class OS_Dashboard extends React.Component {
       ];
     }
 
-componentDidMount() {
-  axios({
-    method:'get',
-    url:'http://10.211.55.253:3000/utilities/onestop/dashboard/fe',
-    headers: { 'authorization': sessionStorage.getItem('token'),
-   }
-  })
-  .catch(function (error) {
-    if (error.response) {
-      // console.log(error.response);
-      alert(error.response.data.message);
-      history.push( '/logout' );
+    componentDidMount() {
+      getDataAPI.all(this.updateResult, myConfig.base_url + '/utilities/onestop/dashboard/fe');
     }
-  })
-    .then(res => {
+  
+    updateResult = (res) => {
       this.setState({currentTime: res.data.currentTime});
       this.setState({cpuData: res.data.cpu_data});
       this.setState({currLoad: res.data.curr_load});
@@ -148,10 +137,8 @@ componentDidMount() {
       this.setState({hostname: res.data.osInfo.hostname});
 
       this.renderRowData(res.data);
-      })
-    .catch(err => console.log(err));
-}
-
+  }
+  
 renderRowData(data) {
   // System Info
   var sysrowData = [];
@@ -540,24 +527,12 @@ export class OS_oracleTableSpace extends React.Component {
   }
 
   componentDidMount() {
-    axios({
-      method:'get',
-      url:'http://10.211.55.253:3000/utilities/onestop/oracleTableSpace',
-      headers: { 'authorization': sessionStorage.getItem('token'),
-     }
-    })
-    .catch(function (error) {
-      if (error.response) {
-        // console.log(error.response);
-        alert(error.response.data.message);
-        history.push( '/logout' );
-      }
-    })
-      .then(res => {
-        this.renderRowData(res.data.rows);
-        })
-      .catch(err => console.log(err));
+    getDataAPI.all(this.updateResult, myConfig.base_url + '/utilities/onestop/oracleTableSpace');
   }
+
+  updateResult = (res) => {
+    this.renderRowData(res.data.rows)
+}
   
   renderRowData(data) {
     var userrowData = [];
@@ -618,6 +593,8 @@ export class OS_oracleTableSpace extends React.Component {
   }
 }
 
+
+
 export class OS_oracleParameters extends React.Component {
   constructor(props) {
     super(props);
@@ -638,62 +615,12 @@ export class OS_oracleParameters extends React.Component {
   }
 
   componentDidMount() {
-    if (!this.state.data) {
-      getData('http://10.211.55.253:3000/utilities/onestop/oracleParameters')
-      .then(data => this.setState({data}))
-      .catch(err => { /*...handle the error...*/});
-    }
-  
-    // TRY thisexport function fetchData(ajaxUrl, postParams) {
-    //   const params = new URLSearchParams()
-    //   _.forEach(postParams, (value, key) => {
-    //     params.append(key, value)
-    //   })
-    
-    //   return axios.post(ajaxUrl, params) // return here
-    //       .then(response => response.data)
-    //       .catch(error => error)
-    // }
-    // and the calling block:
-    
-    // fetchData(ajaxUrl, postParams)
-    //   .then((response) => {
-    //     this.myCallbackFunction(response)
-    //   })
-    //   .catch(error => error)
+    getDataAPI.all(this.updateResult, myConfig.base_url + '/utilities/onestop/oracleParameters');
+  }
 
-    // if (!this.state.data) {
-    //     (async () => {
-    //         try {
-    //           this.setState({data: await getData('http://10.211.55.253:3000/utilities/onestop/oracleParameters') });
-    //             console.log("BOB" + this.state.data);
-    //             this.renderRowData(this.state.data );    
-  
-    //         } catch (e) {
-    //             //...handle the error...
-    //         }
-    //     })();
-    // }
-
+  updateResult = (res) => {
+    this.renderRowData(res.data.rows)
 }
-  // componentDidMount() {
-    // axios({
-    //   method:'get',
-    //   url:'http://10.211.55.253:3000/utilities/onestop/oracleParameters',
-    //   headers: { 'authorization': sessionStorage.getItem('token') }
-    // })
-    // .catch(function (error) {
-    //   if (error.response) {
-    //     // console.log(error.response);
-    //     alert(error.response.data.message);
-    //     history.push( '/logout' );
-    //   }
-    // })
-    //   .then(res => {
-    //     this.renderRowData(res.data.rows);
-    //     })
-    //   .catch(err => console.log(err));
-  // }
   
   renderRowData(data) {
     var userrowData = [];
@@ -703,7 +630,6 @@ export class OS_oracleParameters extends React.Component {
       TYPE: '',
       VALUE: ''
     };
-          console.log(data);
 
     for (let i = 0; i < data.length; i++){
       let row = data[i];
@@ -756,14 +682,82 @@ export class OS_oracleLongRunning extends React.Component {
     super(props);
 
     this.state = {
-      columns: [],
-      rows: []
+      columns: this.getColumns(),
+      rows: [], 
+      data: null
     };
   }
 
+  getColumns() {
+    return [
+      { property: 'SID', header: { label: 'SID' } },
+      { property: 'STIME', header: { label: 'Time' } },
+      { property: 'MESSAGE', header: { label: 'Message' } },
+      { property: 'PERCENT', header: { label: 'Percent' } }
+    ];
+  }
+
+  componentDidMount() {
+    getDataAPI.all(this.updateResult, myConfig.base_url + '/utilities/onestop/oracleLongRunning');
+  }
+
+  updateResult = (res) => {
+    this.renderRowData(res.data.rows)
+}
+  
+  renderRowData(data) {
+    var userrowData = [];
+    var userrow = {
+      id: '',
+      SID: '',
+      STIME: '',
+      MESSAGE: '',
+      PERCENT: ''
+    };
+
+    for (let i = 0; i < data.length; i++){
+      let row = data[i];
+  
+      userrow = {
+        id: i,
+        SID: row.SID,
+        STIME: row.STIME,
+        MESSAGE: row.MESSAGE,
+        PERCENT: row.PERCENT
+      };
+      userrowData.push(userrow);
+    }
+    let rows = userrowData;
+    this.setState({rows});  
+  }
+
   render() {
+    const { columns, rows } = this.state;
+
+    const stylingRenderers = {
+      body: {
+        cell: AlignedBodyCell // the one element we are overriding
+      }
+    };
+
     return(
-      <div></div>
+      <div>
+        <br/>
+        <Column flexGrow={1}>
+        <Row horizontal='center'>
+        <Table.Provider
+          className="pure-table pure-table-striped"
+          columns = {columns }
+          renderers={stylingRenderers}
+          style={{ width: 700 }}   >
+
+          <Table.Header ></Table.Header>
+          
+          <Table.Body rows={ rows} rowKey="id" />
+          </Table.Provider>
+          </Row>
+        </Column>
+      </div>
     );
   }
 }
@@ -773,14 +767,94 @@ export class OS_oracleQueryReservation extends React.Component {
     super(props);
 
     this.state = {
-      columns: [],
-      rows: []
+      columns: this.getColumns(),
+      rows: [], 
+      data: null
     };
   }
 
+  getColumns() {
+    return [
+      { property: 'OWNER_NAME', header: { label: 'Owner' } },
+      { property: 'CONTROLLER_IP', header: { label: 'IP' } },
+      { property: 'CONTROLLER_PORT', header: { label: 'Port' } },
+      { property: 'RESERVATION_TYPE', header: { label: 'Reservation Type' } },
+      { property: 'TARGET_ID', header: { label: 'Target' } },
+      { property: 'TIME_EXPIRES', header: { label: 'Expires' } },
+      { property: 'TIME_RESERVED HEADING', header: { label: 'Time Reserved' } },
+      { property: 'UNIQUE_ID', header: { label: 'UID' } }
+    ];
+  }
+
+  componentDidMount() {
+    getDataAPI.all(this.updateResult, myConfig.base_url + '/utilities/onestop/oracleQueryReservation');
+  }
+
+  updateResult = (res) => {
+    this.renderRowData(res.data.rows)
+}
+  
+  renderRowData(data) {
+    var userrowData = [];
+    var userrow = {
+      id: '',
+      OWNER_NAME: '',
+      CONTROLLER_IP: '',
+      CONTROLLER_PORT: '',
+      RESERVATION_TYPE: '',
+      TARGET_ID: '',
+      TIME_EXPIRES: '',
+      'TIME_RESERVED HEADING': '',
+      UNIQUE_ID: ''
+    };
+
+    for (let i = 0; i < data.length; i++){
+      let row = data[i];
+  
+      userrow = {
+        id: i,
+        OWNER_NAME: row.OWNER_NAME,
+        CONTROLLER_IP: row.CONTROLLER_IP,
+        CONTROLLER_PORT: row.CONTROLLER_PORT,
+        RESERVATION_TYPE: row.RESERVATION_TYPE,
+        TARGET_ID: row.TARGET_ID,
+        TIME_EXPIRES: row.TIME_EXPIRES,
+        'TIME_RESERVED HEADING': row['TIME_RESERVED HEADING'],
+        UNIQUE_ID: row.UNIQUE_ID
+      };
+      userrowData.push(userrow);
+    }
+    let rows = userrowData;
+    this.setState({rows});  
+  }
+
   render() {
+    const { columns, rows } = this.state;
+
+    const stylingRenderers = {
+      body: {
+        cell: AlignedBodyCell // the one element we are overriding
+      }
+    };
+
     return(
-      <div></div>
+      <div>
+        <br/>
+        <Column flexGrow={1}>
+        <Row horizontal='center'>
+        <Table.Provider
+          className="pure-table pure-table-striped"
+          columns = {columns }
+          renderers={stylingRenderers}
+          style={{ width: 700 }}   >
+
+          <Table.Header ></Table.Header>
+          
+          <Table.Body rows={ rows} rowKey="id" />
+          </Table.Provider>
+          </Row>
+        </Column>
+      </div>
     );
   }
 }
@@ -790,14 +864,79 @@ export class OS_oracleGetAppliedRounds extends React.Component {
     super(props);
 
     this.state = {
-      columns: [],
-      rows: []
+      columns: this.getColumns(),
+      rows: [], 
+      data: null
     };
   }
 
+  getColumns() {
+    return [
+      { property: 'NAME', header: { label: 'Name' } },
+      { property: 'DATE_SUPPLIED', header: { label: 'Date Supplied' } },
+      { property: 'DATE_APPLIED', header: { label: 'Date Applied' } }
+    ];
+  }
+
+  componentDidMount() {
+    getDataAPI.all(this.updateResult, myConfig.base_url + '/utilities/onestop/oracleGetAppliedRounds');
+  }
+
+  updateResult = (res) => {
+    this.renderRowData(res.data.rows)
+}
+  
+  renderRowData(data) {
+    var userrowData = [];
+    var userrow = {
+      id: '',
+      NAME: '',
+      DATE_SUPPLIED: '',
+      DATE_APPLIED: ''
+    };
+
+    for (let i = 0; i < data.length; i++){
+      let row = data[i];
+  
+      userrow = {
+        id: i,
+        NAME: row.NAME,
+        DATE_SUPPLIED: row.DATE_SUPPLIED,
+        DATE_APPLIED: row.DATE_APPLIED
+      };
+      userrowData.push(userrow);
+    }
+    let rows = userrowData;
+    this.setState({rows});  
+  }
+
   render() {
+    const { columns, rows } = this.state;
+
+    const stylingRenderers = {
+      body: {
+        cell: AlignedBodyCell // the one element we are overriding
+      }
+    };
+
     return(
-      <div></div>
+      <div>
+        <br/>
+        <Column flexGrow={1}>
+        <Row horizontal='center'>
+        <Table.Provider
+          className="pure-table pure-table-striped"
+          columns = {columns }
+          renderers={stylingRenderers}
+          style={{ width: 800 }}   >
+
+          <Table.Header ></Table.Header>
+          
+          <Table.Body rows={ rows} rowKey="id" />
+          </Table.Provider>
+          </Row>
+        </Column>
+      </div>
     );
   }
 }
@@ -807,14 +946,76 @@ export class OS_oraclecheckRounds extends React.Component {
     super(props);
 
     this.state = {
-      columns: [],
-      rows: []
+      columns: this.getColumns(),
+      rows: [], 
+      data: null
     };
   }
 
+  getColumns() {
+    return [
+      { property: 'COMPLETION_DATE', header: { label: 'Completion Date' } },
+      { property: 'VERSION', header: { label: 'Version' } }
+    ];
+  }
+
+  componentDidMount() {
+    getDataAPI.all(this.updateResult, myConfig.base_url + '/utilities/onestop/oraclecheckRounds');
+  }
+
+  updateResult = (res) => {
+    this.renderRowData(res.data.rows)
+}
+  
+  renderRowData(data) {
+    var userrowData = [];
+    var userrow = {
+      id: '',
+      COMPLETION_DATE: '',
+      VERSION: ''
+    };
+
+    for (let i = 0; i < data.length; i++){
+      let row = data[i];
+  
+      userrow = {
+        id: i,
+        COMPLETION_DATE: row.COMPLETION_DATE,
+        VERSION: row.VERSION
+      };
+      userrowData.push(userrow);
+    }
+    let rows = userrowData;
+    this.setState({rows});  
+  }
+
   render() {
+    const { columns, rows } = this.state;
+
+    const stylingRenderers = {
+      body: {
+        cell: AlignedBodyCell // the one element we are overriding
+      }
+    };
+
     return(
-      <div></div>
+      <div>
+        <br/>
+        <Column flexGrow={1}>
+        <Row horizontal='center'>
+        <Table.Provider
+          className="pure-table pure-table-striped"
+          columns = {columns }
+          renderers={stylingRenderers}
+          style={{ width: 700 }}   >
+
+          <Table.Header ></Table.Header>
+          
+          <Table.Body rows={ rows} rowKey="id" />
+          </Table.Provider>
+          </Row>
+        </Column>
+      </div>
     );
   }
 }
@@ -824,14 +1025,82 @@ export class OS_oraclecheckMaxProcesses extends React.Component {
     super(props);
 
     this.state = {
-      columns: [],
-      rows: []
+      columns: this.getColumns(),
+      rows: [], 
+      data: null
     };
   }
 
+  getColumns() {
+    return [
+      { property: 'RESOURCE_NAME', header: { label: 'Resource Name' } },
+      { property: 'INITIAL_ALLOCATION', header: { label: 'Initial Allocation' } },
+      { property: 'CURRENT_UTILIZATION', header: { label: 'Current Utilization' } },
+      { property: 'MAX_UTILIZATION', header: { label: 'Max Utilization' } }
+    ];
+  }
+
+  componentDidMount() {
+    getDataAPI.all(this.updateResult, myConfig.base_url + '/utilities/onestop/oraclecheckMaxProcesses');
+  }
+
+  updateResult = (res) => {
+    this.renderRowData(res.data.rows)
+}
+  
+  renderRowData(data) {
+    var userrowData = [];
+    var userrow = {
+      id: '',
+      RESOURCE_NAME: '',
+      INITIAL_ALLOCATION: '',
+      CURRENT_UTILIZATION: '',
+      MAX_UTILIZATION: ''
+    };
+
+    for (let i = 0; i < data.length; i++){
+      let row = data[i];
+  
+      userrow = {
+        id: i,
+        RESOURCE_NAME: row.RESOURCE_NAME,
+        INITIAL_ALLOCATION: row.INITIAL_ALLOCATION,
+        CURRENT_UTILIZATION: row.CURRENT_UTILIZATION,
+        MAX_UTILIZATION: row.MAX_UTILIZATION
+      };
+      userrowData.push(userrow);
+    }
+    let rows = userrowData;
+    this.setState({rows});  
+  }
+
   render() {
+    const { columns, rows } = this.state;
+
+    const stylingRenderers = {
+      body: {
+        cell: AlignedBodyCell // the one element we are overriding
+      }
+    };
+
     return(
-      <div></div>
+      <div>
+        <br/>
+        <Column flexGrow={1}>
+        <Row horizontal='center'>
+        <Table.Provider
+          className="pure-table pure-table-striped"
+          columns = {columns }
+          renderers={stylingRenderers}
+          style={{ width: 700 }}   >
+
+          <Table.Header ></Table.Header>
+          
+          <Table.Body rows={ rows} rowKey="id" />
+          </Table.Provider>
+          </Row>
+        </Column>
+      </div>
     );
   }
 }
@@ -841,14 +1110,85 @@ export class OS_oraclecheckGRStatus extends React.Component {
     super(props);
 
     this.state = {
-      columns: [],
-      rows: []
+      columns: this.getColumns(),
+      rows: [], 
+      data: null
     };
   }
 
+  getColumns() {
+    return [
+      { property: 'JOB_PROCESS_NUM', header: { label: 'Job Number' } },
+      { property: 'START_DATE', header: { label: 'Start Date' } },
+      { property: 'JOB_STATUS', header: { label: 'Job Status' } },
+      { property: 'NAME', header: { label: 'Name' } },
+      { property: 'DATA_SET_ID', header: { label: 'Date Set ID' } }
+    ];
+  }
+
+  componentDidMount() {
+    getDataAPI.all(this.updateResult, myConfig.base_url + '/utilities/onestop/oraclecheckGRStatus');
+  }
+
+  updateResult = (res) => {
+    this.renderRowData(res.data.rows)
+}
+  
+  renderRowData(data) {
+    var userrowData = [];
+    var userrow = {
+      id: '',
+      JOB_PROCESS_NUM: '',
+      START_DATE: '',
+      JOB_STATUS: '',
+      NAME: '',
+      DATA_SET_ID: ''
+    };
+
+    for (let i = 0; i < data.length; i++){
+      let row = data[i];
+  
+      userrow = {
+        id: i,
+        JOB_PROCESS_NUM: row.JOB_PROCESS_NUM,
+        START_DATE: row.START_DATE,
+        JOB_STATUS: row.JOB_STATUS,
+        NAME: row.NAME,
+        DATA_SET_ID: row.DATA_SET_ID
+      };
+      userrowData.push(userrow);
+    }
+    let rows = userrowData;
+    this.setState({rows});  
+  }
+
   render() {
+    const { columns, rows } = this.state;
+
+    const stylingRenderers = {
+      body: {
+        cell: AlignedBodyCell // the one element we are overriding
+      }
+    };
+
     return(
-      <div></div>
+      <div>
+        <br/>
+        <Column flexGrow={1}>
+        <Row horizontal='center'>
+        <Table.Provider
+          className="pure-table pure-table-striped"
+          columns = {columns }
+          renderers={stylingRenderers}
+          style={{ width: 700 }}   >
+
+          <Table.Header ></Table.Header>
+          
+          <Table.Body rows={ rows} rowKey="id" />
+          </Table.Provider>
+          </Row>
+        </Column>
+      </div>
     );
   }
 }
@@ -858,14 +1198,94 @@ export class OS_oraclecheckLocks extends React.Component {
     super(props);
 
     this.state = {
-      columns: [],
-      rows: []
+      columns: this.getColumns(),
+      rows: [], 
+      data: null
     };
   }
 
+  getColumns() {
+    return [
+      { property: 'OBJECT_NAME', header: { label: 'Object Name' } },
+      { property: 'OBJECT_TYPE', header: { label: 'Object Type' } },
+      { property: 'SESSION_ID', header: { label: 'Session ID' } },
+      { property: 'TYPE', header: { label: 'Type' } },
+      { property: 'LMODE', header: { label: 'Lmode' } },
+      { property: 'REQUEST', header: { label: 'Request' } },
+      { property: 'BLOCK', header: { label: 'Block' } },
+      { property: 'CTIME', header: { label: 'Time' } }
+    ];
+  }
+
+  componentDidMount() {
+    getDataAPI.all(this.updateResult, myConfig.base_url + '/utilities/onestop/oraclecheckLocks');
+  }
+
+  updateResult = (res) => {
+    this.renderRowData(res.data.rows)
+}
+  
+  renderRowData(data) {
+    var userrowData = [];
+    var userrow = {
+      id: '',
+      OBJECT_NAME: '',
+      OBJECT_TYPE: '',
+      SESSION_ID: '',
+      TYPE: '',
+      LMODE: '',
+      REQUEST: '',
+      BLOCK: '',
+      CTIME: ''
+    };
+
+    for (let i = 0; i < data.length; i++){
+      let row = data[i];
+  
+      userrow = {
+        id: i,
+        OBJECT_NAME: row.OBJECT_NAME,
+        OBJECT_TYPE: row.OBJECT_TYPE,
+        SESSION_ID: row.SESSION_ID,
+        TYPE: row.TYPE,
+        LMODE: row.LMODE,
+        REQUEST: row.REQUEST,
+        BLOCK: row.BLOCK,
+        CTIME: row.CTIME
+      };
+      userrowData.push(userrow);
+    }
+    let rows = userrowData;
+    this.setState({rows});  
+  }
+
   render() {
+    const { columns, rows } = this.state;
+
+    const stylingRenderers = {
+      body: {
+        cell: AlignedBodyCell // the one element we are overriding
+      }
+    };
+
     return(
-      <div></div>
+      <div>
+        <br/>
+        <Column flexGrow={1}>
+        <Row horizontal='center'>
+        <Table.Provider
+          className="pure-table pure-table-striped"
+          columns = {columns }
+          renderers={stylingRenderers}
+          style={{ width: 700 }}   >
+
+          <Table.Header ></Table.Header>
+          
+          <Table.Body rows={ rows} rowKey="id" />
+          </Table.Provider>
+          </Row>
+        </Column>
+      </div>
     );
   }
 }
@@ -875,14 +1295,85 @@ export class OS_oraclecheckActivity extends React.Component {
     super(props);
 
     this.state = {
-      columns: [],
-      rows: []
+      columns: this.getColumns(),
+      rows: [], 
+      data: null
     };
   }
 
+  getColumns() {
+    return [
+      { property: 'USERNAME', header: { label: 'User Name' } },
+      { property: 'SID', header: { label: 'SID' } },
+      { property: 'OSUSER', header: { label: 'OS User' } },
+      { property: 'SQL_ID', header: { label: 'SQL ID' } },
+      { property: 'SQL_TEXT', header: { label: 'SQL Text' } }
+    ];
+  }
+
+  componentDidMount() {
+    getDataAPI.all(this.updateResult, myConfig.base_url + '/utilities/onestop/oraclecheckActivity');
+  }
+
+  updateResult = (res) => {
+    this.renderRowData(res.data.rows)
+}
+  
+  renderRowData(data) {
+    var userrowData = [];
+    var userrow = {
+      id: '',
+      USERNAME: '',
+      SID: '',
+      OSUSER: '',
+      SQL_ID: '',
+      SQL_TEXT: ''
+    };
+
+    for (let i = 0; i < data.length; i++){
+      let row = data[i];
+  
+      userrow = {
+        id: i,
+        USERNAME: row.USERNAME,
+        SID: row.SID,
+        OSUSER: row.OSUSER,
+        SQL_ID: row.SQL_ID,
+        SQL_TEXT: row.SQL_TEXT
+      };
+      userrowData.push(userrow);
+    }
+    let rows = userrowData;
+    this.setState({rows});  
+  }
+
   render() {
+    const { columns, rows } = this.state;
+
+    const stylingRenderers = {
+      body: {
+        cell: AlignedBodyCell // the one element we are overriding
+      }
+    };
+
     return(
-      <div></div>
+      <div>
+        <br/>
+        <Column flexGrow={1}>
+        <Row horizontal='center'>
+        <Table.Provider
+          className="pure-table pure-table-striped"
+          columns = {columns }
+          renderers={stylingRenderers}
+          style={{ width: 800 }}   >
+
+          <Table.Header ></Table.Header>
+          
+          <Table.Body rows={ rows} rowKey="id" />
+          </Table.Provider>
+          </Row>
+        </Column>
+      </div>
     );
   }
 }

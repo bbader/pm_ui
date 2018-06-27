@@ -1,7 +1,7 @@
 
 import React from 'react';
-import axios from 'axios';
 import { compose } from 'redux';
+import { Button } from 'reactstrap';
 import { cloneDeep, findIndex, orderBy } from 'lodash';
 import * as Table from 'reactabular-table';
 import * as search from 'searchtabular';
@@ -14,6 +14,7 @@ import ReactModal from 'react-modal';
 import { Paginator, PrimaryControls, paginate } from '../helpers';
 import { myConfig } from '../config';
 import history from '../history';
+import { getDataAPI, postDataAPI } from './api';
 
 const customStyles = {
   content : {
@@ -50,8 +51,10 @@ export class JobViewer extends React.Component {
       showOk: true,
       okText: 'OK',
       okDisabled: false,
-      link: null
+      link: null,
 
+      deleteLogFilesCheckbox: true,
+      deleteLogFiles: true
     };
 
     this.openLog = this.openLog.bind(this);
@@ -64,27 +67,17 @@ export class JobViewer extends React.Component {
     this.onRemove = this.onRemove.bind(this);
     this.onToggleColumn = this.onToggleColumn.bind(this);
     this.handleCloseModal = this.handleCloseModal.bind(this);
+    this.handleDeleteLogFiles = this.handleDeleteLogFiles.bind(this);
+    this.deleteLogFiles = this.deleteLogFiles.bind(this);
   }
 
-componentDidMount() {
-  axios({
-    method:'get',
-    url: myConfig.base_url + '/utilities/jobViewer/fe',
-    headers: { 'authorization': sessionStorage.getItem('token'), }
-  })
-  .catch(function (error) {
-    if (error.response) {
-      console.log(error.response.status);
-      alert(error.response.data.message);
-      history.push( '/logout' );
-    }
-  })
-    .then(res => {
-      let rows = this.renderRowData(res.data.sqlResult);
-      this.setState({rows});
-      // console.log(res);
-      })
-    .catch(err => console.log(err));
+  componentDidMount() {
+    getDataAPI.all(this.updateResult, myConfig.base_url + '/utilities/jobViewer/fe');
+  }
+
+  updateResult = (res) => {
+    let rows = this.renderRowData(res.data.sqlResult);
+    this.setState({rows});
 }
 
 renderRowData(data) {
@@ -569,6 +562,24 @@ return [
     this.setState({ showModal: false });
   }
 
+  handleDeleteLogFiles () {
+    this.setState({deleteLogFilesCheckbox: !this.state.deleteLogFilesCheckbox});
+    this.setState({deleteLogFiles: !this.state.deleteLogFiles});
+  }
+
+  deleteLogFiles(row) {
+    console.log(row);
+    var data = { 
+      job: row.JOB_NUMBER,
+      keep_logs: this.state.deleteLogFiles
+     }
+
+    postDataAPI.all(this.updateDeleteResult, myConfig.base_url + '/deleteLogEntry', data );
+  }
+
+  updateDeleteResult = (res) => {
+    alert('Job Entry Deleted');
+  }
 
   render() {
 
@@ -600,15 +611,16 @@ return [
     const log_desc4 = this.state.selectedrow.LOG_FILE_DESC4;
     const log5 = this.state.selectedrow.LOG_FILE_URL5;
     const log_desc5 = this.state.selectedrow.LOG_FILE_DESC5;
+    const selectedRow = this.state.selectedrow;
 
     return (
       <div>
-        <h1> Job Viewer </h1>
-
         <VisibilityToggles
           columns={columns}
           onToggleColumn={this.onToggleColumn}
         />
+
+        <input type="checkbox" onChange={this.handleDeleteLogFiles} defaultChecked={this.state.deleteLogFilesCheckbox} /> Delete Log Files
 
         <PrimaryControls
           className="controls"
@@ -640,34 +652,75 @@ return [
           >
 
           <ul>
+            {/* Delete Job Record - params ( job number, keep log (these are the job logs) ) - can't delete if running 
+            if 1 > job number - sanity check to make sure job is there, if not error
+            check for job running, if running error
+            lock job table mutex - looks like we don't need to do this with NodeJS
+              delete log files if requested, ( NOT SURE HOW TO DO THAT JUST YET )
+                ( SELECT count(*) from pds_job WHERE job_number = %d AND job_step_id != 0.0 ) - This gets the step count
+                ( SELECT job_type_id FROM pds_job WHERE job_number = %d AND (job_step_id is NULL OR job_step_id = 0.0) )
+                if 0.0 == job_type_id  FAIL
+                if job_type_id == 6400000606.0 ( Batch Type )
+                  if 0 == step number  ( don't know where this comes from yet )
+                    add ( AND job_step_id = 0.0 ) to the following SQL
+                  else
+                    add ( AND job_mgr_pid = %d", iGetStepNumber ) to the following SQL, step count from above.
+                ( SELECT unique_id FROM pds_job WHERE job_number = %d ) We already know this info with this implementation
+                if UID == 0.0   FAIL
+                Get list of log files ( we already have this here )
+                SELECT log_files FROM pds_job WHERE unique_id = "DSW_UID_FMT
+                Gets all info on the files  path name and such.
+                removes the file then removes the entry 
+                DELETE FROM pds_job_file WHERE unique_id = "DSW_UID_FMT
+
+            ( DELETE FROM pds_job WHERE (job_number = %d or (job_number = %d and job_controller_id = 'app_server'))  )
+            ( DELETE FROM pds_notify WHERE job_number = %d )
+            unlock job table mutex - Not needed ??
+
+            
+            Cancel Active Job
+            Cancel Scheduled Job
+            Cancel Remanining Batch Steps
+            Mofify Recurring Job
+            View Step Information */}
+          {(
+            <li onClick= {() => {this.deleteLogFiles({selectedRow}); this.handleCloseModal(); }}> 
+            <Button outline color='link' size='sm' >Delete Job Record</Button> </li>
+          )}
+          <Button outline color='link' size='sm' disabled >Cancel Active Job</Button> <br/>
+          <Button outline color='link' size='sm' disabled >Cancel Scheduled Job</Button> <br/>
+          <Button outline color='link' size='sm' disabled >Cancel Remanining Batch Steps</Button> <br/>
+          <Button outline color='link' size='sm' disabled >Mofify Recurring Job</Button> <br/>
+          <Button outline color='link' size='sm' disabled >View Step Information</Button> <br/>
+          --------------------------
           {log_desc1 && (
           <li onClick= {() => {this.openLog(myConfig.base_url + myConfig.log_url + `${log1}`); this.handleCloseModal(); }}> 
-          <button className='btn-sm btn-primary'>{log_desc1}</button>    </li>
+          <Button outline color='link' size='sm'>{log_desc1}</Button>    </li>
           )}
 
           {log_desc2 && (
             <li onClick= {() => {this.openLog(myConfig.base_url + myConfig.log_url + `${log2}`); this.handleCloseModal(); }}> 
-            <button className='btn-sm btn-primary'>{log_desc2}</button>    </li>
+            <Button outline color='link' size='sm'>{log_desc2}</Button>    </li>
           )}
 
           {log_desc3 && (
             <li onClick= {() => {this.openLog(myConfig.base_url + myConfig.log_url + `${log3}`); this.handleCloseModal(); }}> 
-            <button className='btn-sm btn-primary'> {log_desc3} </button>    </li>
+            <Button outline color='link' size='sm'> {log_desc3} </Button>    </li>
           )}
 
           {log_desc4 && (
           <li onClick= {() => {this.openLog(myConfig.base_url + myConfig.log_url + `${log4}`); this.handleCloseModal(); }}> 
-          <button className='btn-sm btn-primary'> {log_desc4} </button>    </li>
+          <Button outline color='link' size='sm'> {log_desc4} </Button>    </li>
           )}
 
           {log_desc5 && (
           <li onClick= {() => {this.openLog(myConfig.base_url + myConfig.log_url + `${log5}`); this.handleCloseModal(); }}> 
-          <button className='btn-sm btn-primary'> {log_desc5} </button>    </li>
+          <Button outline color='link' size='sm'> {log_desc5} </Button>    </li>
           )}
 
         </ul>
 
-        <button className='btn-sm btn-info' onClick={this.handleCloseModal}>Close</button>
+        <Button outline color='info' size='sm' onClick={this.handleCloseModal}>Close</Button>
 
         </ReactModal>
 
@@ -710,7 +763,7 @@ return [
     };
   }
   onRowSelected(row) {
-    // console.log('clicked row', row);
+    //console.log('clicked row', row);
     this.setState({ showModal: true });
     this.setState({ selectedrow: row});
   }

@@ -17,12 +17,12 @@ import faHdd from '@fortawesome/fontawesome-free-solid/faHdd';
 import faFile from '@fortawesome/fontawesome-free-solid/faFile';
 import faUserSecret from '@fortawesome/fontawesome-free-solid/faUserSecret';
 import logo from '../images/CHC_Logo_144x68.jpg';
-import axios from 'axios';
 import { myConfig } from '../config';
 import history from '../history';
 import PropTypes from 'prop-types';
 import bcrypt from 'bcryptjs';
 import jwt from'jsonwebtoken';
+import { postDataAPI } from './api';
 
 import { 
   Navbar,
@@ -67,6 +67,43 @@ export class Navigation extends React.Component {
     });
   }
   
+  updateResultAuth = (res) => {
+    var user = {
+      username: this.state.username,
+      password: this.state.password,      
+      token: []
+    };
+
+    var tmpthis = this;
+    bcrypt.compare(user.password, res.data.user.password, function (err, pwMatch) {
+      var payload;
+
+      if (err) {
+        alert('ERROR: Something wong!');
+        return;
+      }
+
+      if (!pwMatch) {
+        alert('ERROR: Invalid username or password!');
+        return;
+      }
+
+      payload = {
+        sub: user.name
+      };
+
+      user.token = jwt.sign(payload, myConfig.jwtSecretKey, {
+        expiresIn: 60 * 60
+      });
+
+      sessionStorage.setItem('token', user.token);
+      sessionStorage.setItem('isAuthenticated', true);
+      tmpthis.setState({isLoggedIn: true});
+      history.push( '/Home' );
+    }
+  );
+}
+
   doAuth(e) {
     this.toggle();
 
@@ -78,54 +115,8 @@ export class Navigation extends React.Component {
       token: []
     };
 
-    var tmpthis = this;
-    axios({
-      method:'post',
-      url: myConfig.base_url + '/api/logins',
-      data: {name: user.username, password: user.password }
-    })
-      .catch(function (error) {
-        if (error.response) {
-          // console.log(error.response);
-          alert('ERROR: ' + error.response.data.message);
-          return;
-        }
-      })
-      .then(res => {
-          // console.log("PW:", res.data.user.password);
-          // console.log("UserPW:", user.pass);
-          // console.log("Token:", res.data.token);
-
-          bcrypt.compare(user.password, res.data.user.password, function (err, pwMatch) {
-            var payload;
-
-            if (err) {
-              alert('ERROR: Something wong!');
-              return;
-            }
-
-            if (!pwMatch) {
-              alert('ERROR: Invalid username or password!');
-              return;
-            }
-
-            payload = {
-              sub: user.name
-            };
-
-            user.token = jwt.sign(payload, myConfig.jwtSecretKey, {
-              expiresIn: 60 * 60
-            });
-
-            sessionStorage.setItem('token', user.token);
-            sessionStorage.setItem('isAuthenticated', true);
-            tmpthis.setState({isLoggedIn: true});
-            history.push( '/Home' );
-
-            });
-          })
-        .catch(err => console.log(err)
-    );
+    var data = { name: user.username, password: user.password }
+    postDataAPI.all(this.updateResultAuth, myConfig.base_url + '/api/logins', data);  
   }
 
     render() {

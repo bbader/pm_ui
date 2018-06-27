@@ -1,8 +1,8 @@
 
 
 import React from 'react';
-import axios from 'axios';
 import PropTypes from 'prop-types'
+import { getDataAPI } from './api';
 
 export class ShowLog extends React.Component {
   static propTypes = {
@@ -18,17 +18,13 @@ export class ShowLog extends React.Component {
   }
 
   componentDidMount() {
-    axios({
-      method:'get',
-      url: this.props.location.link,
-      headers: { 'authorization': sessionStorage.getItem('token'), }
-    })
-      .then(res => {
+    getDataAPI.all(this.updateResult, this.props.location.link);
+  }
+
+  updateResult = (res) => {
         let log = res.data;
         this.setState({log});
-        })
-      .catch(err => console.log(err));
-  }
+}
 
   render() {
     return (

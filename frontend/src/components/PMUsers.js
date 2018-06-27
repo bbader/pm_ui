@@ -2,12 +2,11 @@
 
 
 import React from 'react';
-import axios from 'axios';
 import styled from 'styled-components';
 import * as Table from 'reactabular-table';
 import { Column, Row } from 'simple-flexbox';
 import { myConfig } from '../config';
-import history from '../history';
+import { getDataAPI } from './api';
 
 const AlignedBodyCell = styled.td`
   text-align: ${props => props.isNumber ? 'right' : 'left'};
@@ -20,9 +19,6 @@ export class PMUsers extends React.Component {
       columns: this.getColumns(),
       rows: []
     };
-
-    this.onRow = this.onRow.bind(this);
-    this.onRowSelected = this.onRowSelected.bind(this);
   }
 
   getColumns() {
@@ -35,23 +31,11 @@ export class PMUsers extends React.Component {
   }
 
   componentDidMount() {
-    axios({
-      method:'get',
-      url: myConfig.base_url + '/utilities/pmusers',
-      headers: { 'authorization': sessionStorage.getItem('token'), }
-    })
-    .catch(function (error) {
-      if (error.response) {
-        // console.log(error.response);
-        alert(error.response.data.message);
-        history.push( '/logout' );
-      }
-    })
-      .then(res => {
-        // console.log(res.data.rows);
-        this.renderRowData(res.data.rows);
-        })
-      .catch(err => console.log(err));
+    getDataAPI.all(this.updateResult, myConfig.base_url + '/utilities/pmusers');
+  }
+
+  updateResult = (res) => {
+    this.renderRowData(res.data.rows);
   }
 
   renderRowData(data) {
@@ -112,30 +96,4 @@ export class PMUsers extends React.Component {
       </div>
     );
   }
-  
-  onRow(row) {
-    return {
-      onClick: () => this.onRowSelected(row)
-    };
-  }
-  onRowSelected(row) {
-    axios({
-      method:'post',
-      url: myConfig.base_url + '/utilities/customobject',
-      headers: { 'authorization': sessionStorage.getItem('token'), },
-      data: { name: row.DB_TABLE }
-    })
-    .catch(function (error) {
-      if (error.response) {
-        // console.log(error.response);
-        alert(error.response.data.message);
-      }
-    })
-      .then(res => {
-        // console.log(res);
-        alert(res.statusText);
-        })
-      .catch(err => console.log(err));
-  }
-
 }

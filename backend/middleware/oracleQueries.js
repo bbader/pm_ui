@@ -220,7 +220,6 @@ exports.checkActivity = function(req, res, next) {
             outFormat: database.OBJECT
         })
         .then( results => {
-            console.log(results);
             sqlData.sqlResult = results;
             next();
         })

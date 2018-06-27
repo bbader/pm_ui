@@ -1,12 +1,11 @@
 
 
 import React from 'react';
-import axios from 'axios';
 import styled from 'styled-components';
 import * as Table from 'reactabular-table';
 import { Column, Row } from 'simple-flexbox';
 import { myConfig } from '../config';
-import history from '../history';
+import { getDataAPI, postDataAPI } from './api';
 
 const AlignedBodyCell = styled.td`
   text-align: ${props => props.isNumber ? 'right' : 'left'};
@@ -32,23 +31,11 @@ export class CustomObject extends React.Component {
   }
 
   componentDidMount() {
-    axios({
-      method:'get',
-      url: myConfig.base_url + '/utilities/customobject',
-      headers: { 'authorization': sessionStorage.getItem('token'), }
-    })
-    .catch(function (error) {
-      if (error.response) {
-        // console.log(error.response);
-        alert(error.response.data.message);
-        history.push( '/logout' );
-      }
-    })
-      .then(res => {
-        // console.log(res.data.rows);
-        this.renderRowData(res.data.rows);
-        })
-      .catch(err => console.log(err));
+    getDataAPI.all(this.updateResult, myConfig.base_url + '/utilities/customobject');
+  }
+
+  updateResult = (res) => {
+    this.renderRowData(res.data.rows);
   }
 
   renderRowData(data) {
@@ -113,24 +100,14 @@ export class CustomObject extends React.Component {
       onClick: () => this.onRowSelected(row)
     };
   }
-  onRowSelected(row) {
-    axios({
-      method:'post',
-      url: myConfig.base_url + '/utilities/customobject',
-      headers: { 'authorization': sessionStorage.getItem('token'), },
-      data: { name: row.DB_TABLE }
-    })
-    .catch(function (error) {
-      if (error.response) {
-        // console.log(error.response);
-        alert(error.response.data.message);
-      }
-    })
-      .then(res => {
-        // console.log(res);
-        alert(res.statusText);
-        })
-      .catch(err => console.log(err));
+
+  updateResultCO = (res) => {
+    alert(res.statusText);
   }
 
-}
+  onRowSelected(row) {
+    var data = { name: row.DB_TABLE };
+    postDataAPI.all(this.updateResultCO, myConfig.base_url + '/utilities/customobject', data);  
+  }
+
+}  // end of class
