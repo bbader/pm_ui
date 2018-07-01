@@ -568,13 +568,12 @@ return [
   }
 
   deleteLogFiles(row) {
-    console.log(row);
     var data = { 
-      job: row.JOB_NUMBER,
-      keep_logs: this.state.deleteLogFiles
+      job: row.selectedRow.JOB_NUMBER,
+      keep_logs: this.state.deleteLogFiles,
+      files: ["bob", row.selectedRow.LOG_FILE_URL1, row.selectedRow.LOG_FILE_URL2, row.selectedRow.LOG_FILE_URL3, row.selectedRow.LOG_FILE_URL4, row.selectedRow.LOG_FILE_URL5]
      }
-
-    postDataAPI.all(this.updateDeleteResult, myConfig.base_url + '/deleteLogEntry', data );
+    postDataAPI.all(this.updateDeleteResult, myConfig.base_url + '/utilities/deleteLogEntry', data );
   }
 
   updateDeleteResult = (res) => {
