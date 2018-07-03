@@ -7,6 +7,13 @@ var DashBdData = require("../models/onestop");
 var oracleQueries = require("../middleware/oracleQueries");
 var customObject = require("../middleware/customobject");
 var pmUsers = require("../middleware/pmusers");
+var jobViewerUtils = require("../middleware/jobViewerUtils");
+
+const { JV_DeleteJob } = jobViewerUtils;
+
+router.post("/deleteLogEntry", JV_DeleteJob, function (req, res) {
+    return res.status(200).json(DashBdData.sqlResult);
+});
 
 const { PMUsers } = pmUsers;
 
