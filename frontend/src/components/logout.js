@@ -7,6 +7,8 @@ export class Logout extends React.Component {
 
   componentDidMount() {
     sessionStorage.removeItem('token');
+    sessionStorage.removeItem('role');
+    sessionStorage.removeItem('uname');
     sessionStorage.setItem('isAuthenticated', false);
     history.push( '/' );
   }

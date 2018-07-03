@@ -42,6 +42,7 @@ export class Navigation extends React.Component {
     this.state = {
       modal: false,
       username: '',
+      role: '',
       password: ''
     };
 
@@ -70,6 +71,7 @@ export class Navigation extends React.Component {
   updateResultAuth = (res) => {
     var user = {
       username: this.state.username,
+      role:     this.state.role,
       password: this.state.password,      
       token: []
     };
@@ -89,14 +91,18 @@ export class Navigation extends React.Component {
       }
 
       payload = {
-        sub: user.name
+        sub: user.username
       };
+
+      user.role = res.data.user.role;
 
       user.token = jwt.sign(payload, myConfig.jwtSecretKey, {
         expiresIn: 60 * 60
       });
 
       sessionStorage.setItem('token', user.token);
+      sessionStorage.setItem('uname', user.username);
+      sessionStorage.setItem('role', user.role);
       sessionStorage.setItem('isAuthenticated', true);
       tmpthis.setState({isLoggedIn: true});
       history.push( '/Home' );
@@ -111,6 +117,7 @@ export class Navigation extends React.Component {
 
     var user = {
       username: this.state.username,
+      role:     this.state.role,
       password: this.state.password,
       token: []
     };
@@ -129,7 +136,7 @@ export class Navigation extends React.Component {
           <NavbarToggler onClick={this.toggle} />
 
           <div>
-            <Button size="sm" color="link" onClick={this.toggle}>  {JSON.parse(sessionStorage.getItem('isAuthenticated'))  ? ' ' : 'Login'}   </Button>
+            <Button size="sm" color="link" onClick={this.toggle}>  {JSON.parse(sessionStorage.getItem('isAuthenticated'))  ? sessionStorage.getItem('uname') : 'Login'}   </Button>
             <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
             <Form>
             <FormGroup row>
@@ -204,6 +211,14 @@ export class MyMenu extends React.Component {
   }
 
   render () {
+    const isLoggedIn = sessionStorage.getItem('isAuthenticated'),
+          userRole   = sessionStorage.getItem('role');
+    let addUserButton;
+    console.log (isLoggedIn + '     ' + userRole);
+    if (isLoggedIn && userRole === 'ADMIN') {
+      addUserButton = <DropdownItem><NavLink  className="nav-link dropdown-item" to="/addUser"> <FontAwesomeIcon icon={faEye}/> Add User  </NavLink> </DropdownItem>
+    }
+
     return (
       <div>
         <Nav pills>
@@ -255,11 +270,8 @@ export class MyMenu extends React.Component {
               <FontAwesomeIcon icon={faDesktop}/> System Administration
             </DropdownToggle>
             <DropdownMenu>
-              <DropdownItem header>Header</DropdownItem>
-              <DropdownItem disabled>Action</DropdownItem>
-              <DropdownItem>Another Action</DropdownItem>
+              {addUserButton}
               <DropdownItem divider />
-              <DropdownItem>Another Action</DropdownItem>
             </DropdownMenu>
           </UncontrolledButtonDropdown>
 

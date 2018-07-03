@@ -5,8 +5,11 @@ var config = require('../public/dbconfig');
 
 function post(req, res, next) {
   var user = {
+    fullname: req.body.fullname,
     name: req.body.name,
-    role: req.body.role
+    role: req.body.role,
+    email: req.body.email,
+    department: req.body.department
   };
   var unhashedPassword = req.body.password;
 
@@ -78,14 +81,20 @@ function insertUser(user, cb) {
 
       connection.execute(
         'insert into jsao_users ( ' +
+        '   fullname, ' +
         '   name, ' +
         '   password, ' +
-        '   role ' +
+        '   role, ' +
+        '   email, ' +
+        '   department ' +
         ') ' +
         'values (' +
+        '    :fullname, ' +
         '    :name, ' +
         '    :password, ' +
-        '    :role ' +
+        '    :role, ' +
+        '    :email, ' +
+        '    :department ' +
         ') ' +
         'returning ' +
         '   id, ' +
@@ -97,7 +106,10 @@ function insertUser(user, cb) {
         '   :rrole', {
           name: user.name.toLowerCase(),
           password: user.hashedPassword,
-          role: user.role,
+          role: user.role.toUpperCase(),
+          fullname: user.fullname,
+          email: user.email,
+          department: user.department,
           rid: {
             type: oracledb.NUMBER,
             dir: oracledb.BIND_OUT

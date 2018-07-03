@@ -14,6 +14,7 @@ function post(req, res, next) {
       connection.execute(
         'select id as "id", ' +
         '   name as "name", ' +
+        '   role as "role", ' +
         '   password as "password" ' +
         'from jsao_users ' +
         'where name = :name', {
