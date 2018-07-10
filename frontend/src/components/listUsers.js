@@ -260,7 +260,7 @@ renderRowData(data) {
     };
   }
   onRowSelected(row) {
-    console.log('clicked row', row);
+    // console.log('clicked row', row);
     this.setState({ selectedrow: row});
   }
   onColumnChange(searchColumn) {
@@ -294,7 +294,6 @@ renderRowData(data) {
     });
   }
   onRemove(row) {
-    console.log(row);
     let id = row.id;
 
     const rows = cloneDeep(this.state.rows);
@@ -308,11 +307,11 @@ renderRowData(data) {
     var data = { 
       userid: row.ROWID,
       type: 'delete'
-     }
+     };
     postDataAPI.all(this.updateDeleteResult, myConfig.base_url + '/api/deleteUser', data );
   }
 
-  updateDeleteResult = (res) => {
+  updateDeleteResult = () => {
     alert('User Deleted');
   }
 
