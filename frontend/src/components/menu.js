@@ -213,10 +213,11 @@ export class MyMenu extends React.Component {
   render () {
     const isLoggedIn = sessionStorage.getItem('isAuthenticated'),
           userRole   = sessionStorage.getItem('role');
-    let addUserButton;
-    console.log (isLoggedIn + '     ' + userRole);
+    let addUserButton, listUserButton;
+    // console.log (isLoggedIn + '     ' + userRole);
     if (isLoggedIn && userRole === 'ADMIN') {
       addUserButton = <DropdownItem><NavLink  className="nav-link dropdown-item" to="/addUser"> <FontAwesomeIcon icon={faEye}/> Add User  </NavLink> </DropdownItem>
+      listUserButton = <DropdownItem><NavLink  className="nav-link dropdown-item" to="/listUsers"> <FontAwesomeIcon icon={faEye}/> List Users  </NavLink> </DropdownItem>
     }
 
     return (
@@ -271,6 +272,7 @@ export class MyMenu extends React.Component {
             </DropdownToggle>
             <DropdownMenu>
               {addUserButton}
+              {listUserButton}
               <DropdownItem divider />
             </DropdownMenu>
           </UncontrolledButtonDropdown>

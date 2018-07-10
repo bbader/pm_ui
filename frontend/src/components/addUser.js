@@ -34,7 +34,7 @@ class LoginForm extends React.Component {
   
   updateResultAuth = (res) => {
 
-    history.push( '/Home' );
+    history.push( '/listUsers' );
   }
 
   // Actions

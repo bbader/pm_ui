@@ -16,6 +16,8 @@ import {CustomObject} from './components/CustomObject';
 import {PMUsers} from './components/PMUsers';
 import {Logout} from './components/logout';
 import {addUser} from './components/addUser';
+import {listUsers} from './components/listUsers';
+
 
 import history from './history';
 import PropTypes from 'prop-types';
@@ -36,6 +38,8 @@ const Main = () => (
       <Route exact path ="/logout" component={Logout} />
 
       <PrivateRoute exact path="/addUser" component={addUser}/>
+      <PrivateRoute exact path="/listUsers" component={listUsers}/>
+
 
       <PrivateRoute exact path="/OS_Dashboard" component={OS_Dashboard}/>
       <PrivateRoute exact path="/OS_Processes" component={OS_Processes}/>

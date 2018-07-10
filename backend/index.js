@@ -44,6 +44,8 @@ app.use("/utilities", auth(), utilitiesRoutes);
 
 router = express.Router();
 router.post("/users",  users.post);
+router.post("/deleteUser", users.post);
+router.get('/listUsers', users.get);
 router.post('/logins', logins.post);
 
 app.use('/api', router);

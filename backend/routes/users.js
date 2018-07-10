@@ -2,8 +2,40 @@ var oracledb = require('oracledb');
 var bcrypt = require('bcryptjs');
 var jwt = require('jsonwebtoken');
 var config = require('../public/dbconfig');
+var database    = require('../middleware/database.js');
+
+function get(req, res, next) {
+  database.simpleExecute(
+    'select id, fullname, name, role, email, department from jsao_users ',
+    {},
+    {
+        outFormat: database.OBJECT
+    })
+    .then( results => {
+        res.status(200).json({
+          results: results,
+        });
+    })
+    .catch( err => {
+        next(err);
+    });    
+}
+module.exports.get = get;
+
 
 function post(req, res, next) {
+
+  if (req.body.type === "delete") {
+    deleteUser(req.body.userid, function (err, user) {
+      if (err) {
+        return next(err);
+      }
+      res.status(200).json({
+        status: 'OK'
+      });
+    });
+  }
+  else {
   var user = {
     fullname: req.body.fullname,
     name: req.body.name,
@@ -24,7 +56,6 @@ function post(req, res, next) {
       }
 
       user.hashedPassword = hash;
-
       if (req.body.type === "update") {
         updatePassword(user, function (err, user) {
           var payload;
@@ -67,6 +98,7 @@ function post(req, res, next) {
       }
     });
   });
+}
 }
 
 module.exports.post = post;
@@ -191,4 +223,22 @@ function updatePassword(user, cb) {
         });
     }
   );
+}
+
+function deleteUser(userid, cb) {
+  database.simpleExecute(
+    'delete from jsao_users where id = ' + parseInt(userid) ,
+    {},
+    {
+      autoCommit: true,
+      outFormat: database.OBJECT
+    })
+    .then( results => {
+      cb(null, {
+        status: 'OK'
+      });
+    })
+    .catch( err => {
+      return cb(err);
+    });    
 }
