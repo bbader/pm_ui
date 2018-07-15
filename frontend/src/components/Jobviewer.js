@@ -54,7 +54,9 @@ export class JobViewer extends React.Component {
       link: null,
 
       deleteLogFilesCheckbox: true,
-      deleteLogFiles: true
+      deleteLogFiles: true,
+
+      refreshInterval: '10'
     };
 
     this.openLog = this.openLog.bind(this);
@@ -69,10 +71,25 @@ export class JobViewer extends React.Component {
     this.handleCloseModal = this.handleCloseModal.bind(this);
     this.handleDeleteLogFiles = this.handleDeleteLogFiles.bind(this);
     this.deleteLogFiles = this.deleteLogFiles.bind(this);
+    this.handleChangeRefresh = this.handleChangeRefresh.bind(this);
   }
 
   componentDidMount() {
     getDataAPI.all(this.updateResult, myConfig.base_url + '/utilities/jobViewer/fe');
+  }
+
+  // componentWillUpdate() {
+  //   this.interval = setInterval(() => {
+  //     //autoPlay some for specific period of times or
+  //     // Do some stuff you want
+  //     console.log(parseInt(this.state.refreshInterval, 10) );
+
+  //     getDataAPI.all(this.updateResult, myConfig.base_url + '/utilities/jobViewer/fe');
+  //   }, parseInt(this.state.refreshInterval, 10) * 1000); 
+  // }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
   }
 
   updateResult = (res) => {
@@ -149,6 +166,8 @@ renderRowData(data) {
         LOG_FILE_URL5: row.LOG_FILE_URL5  
       };
   
+      console.log(row.START_DATE );
+
       rowData.push( rows );
     }
     return rowData;
@@ -554,8 +573,30 @@ return [
       ]
     },
     visible: false
+  },
+  {
+    header: { 
+      label: 'Delete Job',
+      props: { style: { width: 50 } } },
+    cell: {
+      formatters: [ (value, { rowData }) => (
+          <span
+            className="remove"
+            onClick={() => { this.onRemove(rowData);  } } style={{ cursor: 'pointer' }} >
+            &#10007;
+          </span> ) ] },
+    visible: true
   }
 ];
+}
+
+handleChangeRefresh(e) {
+  e.preventDefault();
+
+  this.setState({
+    [e.target.name]: e.target.value
+  });
+  console.log(this.state.refreshInterval);
 }
 
   handleCloseModal () {
@@ -572,13 +613,19 @@ return [
       job: row.selectedRow.JOB_NUMBER,
       keep_logs: this.state.deleteLogFiles,
       files: [row.selectedRow.LOG_FILE_URL1, row.selectedRow.LOG_FILE_URL2, row.selectedRow.LOG_FILE_URL3, row.selectedRow.LOG_FILE_URL4, row.selectedRow.LOG_FILE_URL5]
-     }
+     };
     postDataAPI.all(this.updateDeleteResult, myConfig.base_url + '/utilities/deleteLogEntry', data );
   }
 
-  updateDeleteResult = (res) => {
-    alert('Job Entry Deleted');
+  updateDeleteResult = () => {
+    this.setState({ showModal: false });
   }
+
+  onKeyPress(event) {
+    if (event.which === 13 /* Enter */) {
+      event.preventDefault();
+    }
+}
 
   render() {
 
@@ -619,8 +666,37 @@ return [
           onToggleColumn={this.onToggleColumn}
         />
 
-        <input type="checkbox" onChange={this.handleDeleteLogFiles} defaultChecked={this.state.deleteLogFilesCheckbox} /> Delete Log Files
+        <form>
+          <input type="checkbox"  onChange={this.handleDeleteLogFiles} defaultChecked={this.state.deleteLogFilesCheckbox} /> Delete Log Files
+          {' *'}
+          <label style={{marginLeft: 5 }} >Refresh Interval  </label>
+          <input type="text" style={{width: 40, marginLeft: 10 }} name="refreshInterval" value={this.state.refreshInterval} onChange={this.handleChangeRefresh} onKeyPress={this.onKeyPress} />
+        </form>
 
+{/*
+  Type
+    Attached
+    Detached
+    Batch
+    Recurring
+
+  Status
+    Running
+    Completed
+    Scheduled
+
+  Users
+    All
+    My jobs
+
+  Dates
+    Job Starting
+    Job Completing
+    Today
+    Yesterday
+        NEW ONE - ALL DATES, then can search with the table
+
+*/}
         <PrimaryControls
           className="controls"
           perPage={pagination.perPage}
@@ -682,10 +758,10 @@ return [
             Cancel Remanining Batch Steps
             Mofify Recurring Job
             View Step Information */}
-          {(
-            <li onClick= {() => {this.deleteLogFiles({selectedRow}); this.handleCloseModal(); }}> 
+          {/* {(
+            <li onClick= {() => {this.deleteLogFiles({selectedRow}); this.onRemove({selectedRow}); this.handleCloseModal(); }}> 
             <Button outline color='link' size='sm' >Delete Job Record</Button> </li>
-          )}
+          )} */}
           <Button outline color='link' size='sm' disabled >Cancel Active Job</Button> <br/>
           <Button outline color='link' size='sm' disabled >Cancel Scheduled Job</Button> <br/>
           <Button outline color='link' size='sm' disabled >Cancel Remanining Batch Steps</Button> <br/>
@@ -796,7 +872,8 @@ return [
       }
     });
   }
-  onRemove(id) {
+  onRemove(row) {
+    let id = row.id;
     const rows = cloneDeep(this.state.rows);
     const idx = findIndex(rows, { id });
 
@@ -804,6 +881,14 @@ return [
     rows.splice(idx, 1);
 
     this.setState({ rows });
+
+    var data = { 
+      job: row.JOB_NUMBER,
+      keep_logs: this.state.deleteLogFiles,
+      files: [row.LOG_FILE_URL1, row.LOG_FILE_URL2, row.LOG_FILE_URL3, row.LOG_FILE_URL4, row.LOG_FILE_URL5]
+     };
+    postDataAPI.all(this.updateDeleteResult, myConfig.base_url + '/utilities/deleteLogEntry', data );
+
   }
 
 }

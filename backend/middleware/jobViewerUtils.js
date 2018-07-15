@@ -5,18 +5,19 @@ var sqlData     = require("../models/onestop");
 var database    = require('./database.js');
 
 exports.JV_DeleteJob = function(req, res, next) {
-  console.log(req.body.job);
-  console.log(req.body.keep_logs);
+  // console.log(req.body.job);
+  // console.log(req.body.keep_logs);
 
   if (req.body.keep_logs === true) {
-    console.log("Deleting log files");
+    // console.log("Deleting log files");
     req.body.files.forEach(function(value) {
       if (value) {
-        fs.unlink('/apg/bobSaysDeleteMe.txt', function(error) {
+        // console.log(value);
+        fs.unlink(value, function(error) {
           if (error) {
             console.log('ERROR: File Not Found');
           } else {
-            console.log('Deleted bobSaysDeleteMe.txt!!');
+            console.log('Deleted ' + value);
           }
           next();
         });
@@ -25,10 +26,11 @@ exports.JV_DeleteJob = function(req, res, next) {
   }
 
   let sql = "DELETE FROM pds_job WHERE (job_number = " + req.body.job + " or (job_number = " + req.body.job + " and job_controller_id = 'app_server'))";
+  // console.log (sql);
   database.simpleExecute(
     sql,
     {},
-    { outFormat: database.OBJECT })
+    { autoCommit: true, outFormat: database.OBJECT })
     .then( results => {
       sqlData.sqlResult = results;
       next();
@@ -37,11 +39,13 @@ exports.JV_DeleteJob = function(req, res, next) {
       next(err);
     });
 
-  let sql = "DELETE FROM pds_notify WHERE job_number = " + req.body.job ;
+  sql = "DELETE FROM pds_notify WHERE job_number = " + req.body.job ;
+  // console.log (sql);
+
   database.simpleExecute(
     sql,
     {},
-    { outFormat: database.OBJECT })
+    { autoCommit: true, outFormat: database.OBJECT })
     .then( results => {
       sqlData.sqlResult = results;
       next();

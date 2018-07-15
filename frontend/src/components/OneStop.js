@@ -120,7 +120,15 @@ export class OS_Dashboard extends React.Component {
     }
 
     componentDidMount() {
-      getDataAPI.all(this.updateResult, myConfig.base_url + '/utilities/onestop/dashboard/fe');
+      this.interval = setInterval(() => {
+        //autoPlay some for specific period of times or
+        // Do some stuff you want
+        getDataAPI.all(this.updateResult, myConfig.base_url + '/utilities/onestop/dashboard/fe');
+      }, 5000); 
+    }
+  
+    componentWillUnmount() {
+      clearInterval(this.interval);
     }
   
     updateResult = (res) => {

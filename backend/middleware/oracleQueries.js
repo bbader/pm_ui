@@ -258,17 +258,9 @@ async function getJobViewer(req, res, next) {
         sqlData.sqlResult = results.rows;
 
         await getLogFileName(sqlData.sqlResult);
-                console.log(sqlData.sqlResult);
-
         await getJobTypeName(sqlData.sqlResult);
-                console.log(sqlData.sqlResult);
-
         await getOwnereName(sqlData.sqlResult);
-        console.log(sqlData.sqlResult);
-
         await getFunctionName(sqlData.sqlResult);
-        console.log(sqlData.sqlResult);
-
         await setStatus(sqlData.sqlResult);
         await setFinishStatus(sqlData.sqlResult);
         //console.log(sqlData.sqlResult);
