@@ -5,7 +5,7 @@ import { Router, Route } from 'react-router-dom';
 import {MyMenu, Navigation} from './components/menu';
 import {Home} from './components/Home';
 import {Test} from './components/test';
-import {OS_Dashboard, OS_Processes, OS_Network, OS_Disks, OS_Logs, 
+import {OS_Dashboard, OS_Processes, OS_Network, OS_Logs, 
         OS_oracleTableSpace, OS_oracleParameters, OS_oracleLongRunning, OS_oracleQueryReservation,
         OS_oracleGetAppliedRounds, OS_oraclecheckRounds, OS_oraclecheckMaxProcesses,
         OS_oraclecheckGRStatus, OS_oraclecheckLocks, OS_oraclecheckActivity,
@@ -24,7 +24,7 @@ import PropTypes from 'prop-types';
 
 const Main = () => (
   <Router history={history}>
-    <div className="Main">
+    <div className='Main'>
     <Navigation />
 
       <div>
@@ -44,7 +44,6 @@ const Main = () => (
       <PrivateRoute exact path="/OS_Dashboard" component={OS_Dashboard}/>
       <PrivateRoute exact path="/OS_Processes" component={OS_Processes}/>
       <PrivateRoute exact path="/OS_Network" component={OS_Network}/>
-      <PrivateRoute exact path="/OS_Disks" component={OS_Disks}/>
       <PrivateRoute exact path="/OS_Logs" component={OS_Logs}/>
 
       <PrivateRoute exact path="/OS_oracleTableSpace" component={OS_oracleTableSpace}/>

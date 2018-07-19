@@ -12,6 +12,7 @@
     "axios": "^0.18.0",
     "bcryptjs": "^2.4.3",
     "bootstrap": "^4.1.1",
+    "bytes": "^3.0.0",
     "history": "^4.7.2",
     "jsonwebtoken": "^8.3.0",
     "lodash": "^4.17.10",

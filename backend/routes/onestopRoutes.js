@@ -20,7 +20,7 @@ var middleware2 = require("../middleware/oracleQueries");
 // getOSInfo
 
 
-const {  getCPVer, getCurrentTime, getCpuData, getPMVer, getMemData, getFileSystemData, getOSInfo, getLoadData, getNetworkData, getUserData } = middleware; // destructuring assignment
+const {  getCPVer, getCurrentTime, getCpuData, getPMVer, getMemData, getFileSystemData, getOSInfo, getLoadData, getNetworkData, getNetworkConnectionData, getUserData, getProcessData } = middleware; // destructuring assignment
 const { getTableSpace, getParameters, getLongRunningQueries, getReservationTable, getAppliedRounds, checkRounds, checkMaxProcesses, checkGRStatus, checkLocks, checkActivity } = middleware2;
 
 router.get("/dashboard", getCPVer, getNetworkData, getCurrentTime, getCpuData, getPMVer, getMemData, getFileSystemData, getOSInfo, getLoadData, getUserData, function (req, res) {
@@ -31,6 +31,23 @@ router.get("/dashboard/fe", getCPVer, getNetworkData, getCurrentTime, getCpuData
     return res.status(200).json(DashBdData);
 });
 
+router.get("/getProcesses", getProcessData, function (req, res) {
+    if (req.query.backend === "true" ) { 
+        res.render("utilities/onestop/NO_VIEW_FOR_THIS_YET", {
+            data: DashBdData.sqlResult
+        }); 
+    } else {
+     return res.status(200).json(DashBdData.processes); }
+});
+
+router.get("/getNetwork", getNetworkData, getNetworkConnectionData, function (req, res) {
+    if (req.query.backend === "true" ) { 
+        res.render("utilities/onestop/NO_VIEW_FOR_THIS_YET", {
+            data: DashBdData
+        }); 
+    } else {
+     return res.status(200).json(DashBdData); }
+});
 
 router.get("/oracleTableSpace", getTableSpace, function (req, res) {
     if (req.query.backend === "true" ) { 

@@ -13,7 +13,6 @@ import faToolbox from '@fortawesome/fontawesome-free-solid/faToolbox';
 import faMicrochip from '@fortawesome/fontawesome-free-solid/faMicrochip';
 import faEye from '@fortawesome/fontawesome-free-solid/faEye';
 import faSitemap from '@fortawesome/fontawesome-free-solid/faSitemap';
-import faHdd from '@fortawesome/fontawesome-free-solid/faHdd';
 import faFile from '@fortawesome/fontawesome-free-solid/faFile';
 import faUserSecret from '@fortawesome/fontawesome-free-solid/faUserSecret';
 import logo from '../images/CHC_Logo_144x68.jpg';
@@ -294,7 +293,6 @@ export class MyMenu extends React.Component {
                 <DropdownItem><NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/OS_Dashboard" > <FontAwesomeIcon icon={faClipboard}/> Dashboard  </NavLink> </DropdownItem>
                 <DropdownItem><NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/OS_Processes" > <FontAwesomeIcon icon={faMicrochip}/> Processes  </NavLink> </DropdownItem>
                 <DropdownItem><NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/OS_Network" > <FontAwesomeIcon icon={faSitemap}/> Network  </NavLink> </DropdownItem>
-                <DropdownItem><NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/OS_Disks" > <FontAwesomeIcon icon={faHdd}/> Disks  </NavLink> </DropdownItem>
                 <DropdownItem><NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/OS_Logs" > <FontAwesomeIcon icon={faFile}/> Logs  </NavLink> </DropdownItem>
                 <Dropdown nav isOpen={this.state.osoracledropdownOpen} toggle={this.toggleosoracle}>
                   <DropdownToggle nav caret> <FontAwesomeIcon icon={faDatabase}/> Oracle </DropdownToggle>

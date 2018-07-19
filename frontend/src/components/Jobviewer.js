@@ -166,7 +166,7 @@ renderRowData(data) {
         LOG_FILE_URL5: row.LOG_FILE_URL5  
       };
   
-      console.log(row.START_DATE );
+      // console.log(row.START_DATE );
 
       rowData.push( rows );
     }
@@ -596,7 +596,7 @@ handleChangeRefresh(e) {
   this.setState({
     [e.target.name]: e.target.value
   });
-  console.log(this.state.refreshInterval);
+  // console.log(this.state.refreshInterval);
 }
 
   handleCloseModal () {
@@ -657,7 +657,7 @@ handleChangeRefresh(e) {
     const log_desc4 = this.state.selectedrow.LOG_FILE_DESC4;
     const log5 = this.state.selectedrow.LOG_FILE_URL5;
     const log_desc5 = this.state.selectedrow.LOG_FILE_DESC5;
-    const selectedRow = this.state.selectedrow;
+    // const selectedRow = this.state.selectedrow;
 
     return (
       <div>
@@ -727,32 +727,7 @@ handleChangeRefresh(e) {
           >
 
           <ul>
-            {/* Delete Job Record - params ( job number, keep log (these are the job logs) ) - can't delete if running 
-            if 1 > job number - sanity check to make sure job is there, if not error
-            check for job running, if running error
-            lock job table mutex - looks like we don't need to do this with NodeJS
-              delete log files if requested, ( NOT SURE HOW TO DO THAT JUST YET )
-                ( SELECT count(*) from pds_job WHERE job_number = %d AND job_step_id != 0.0 ) - This gets the step count
-                ( SELECT job_type_id FROM pds_job WHERE job_number = %d AND (job_step_id is NULL OR job_step_id = 0.0) )
-                if 0.0 == job_type_id  FAIL
-                if job_type_id == 6400000606.0 ( Batch Type )
-                  if 0 == step number  ( don't know where this comes from yet )
-                    add ( AND job_step_id = 0.0 ) to the following SQL
-                  else
-                    add ( AND job_mgr_pid = %d", iGetStepNumber ) to the following SQL, step count from above.
-                ( SELECT unique_id FROM pds_job WHERE job_number = %d ) We already know this info with this implementation
-                if UID == 0.0   FAIL
-                Get list of log files ( we already have this here )
-                SELECT log_files FROM pds_job WHERE unique_id = "DSW_UID_FMT
-                Gets all info on the files  path name and such.
-                removes the file then removes the entry 
-                DELETE FROM pds_job_file WHERE unique_id = "DSW_UID_FMT
-
-            ( DELETE FROM pds_job WHERE (job_number = %d or (job_number = %d and job_controller_id = 'app_server'))  )
-            ( DELETE FROM pds_notify WHERE job_number = %d )
-            unlock job table mutex - Not needed ??
-
-            
+            {/* 
             Cancel Active Job
             Cancel Scheduled Job
             Cancel Remanining Batch Steps

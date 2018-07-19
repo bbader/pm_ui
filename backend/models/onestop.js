@@ -18,6 +18,8 @@ var data = {
     network_stats: [],
     network_connection: {},
     fileSystem: {},
+    fileSystemStats: {},
+    diskIO: {},
     userData: {},
     systemLoad: {},
     processes: {},

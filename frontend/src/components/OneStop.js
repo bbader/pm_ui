@@ -1,6 +1,15 @@
 import React from 'react';
+import { Button } from 'reactstrap';
+import { compose } from 'redux';
+import { cloneDeep, orderBy } from 'lodash';
 import styled from 'styled-components';
 import * as Table from 'reactabular-table';
+import * as search from 'searchtabular';
+import * as sort from 'sortabular';
+import * as resizable from 'reactabular-resizable';
+import * as resolve from 'table-resolver';
+import VisibilityToggles from 'react-visibility-toggles';
+import { Paginator, PrimaryControls, paginate } from '../helpers';
 import { Column, Row } from 'simple-flexbox';
 import { myConfig } from '../config';
 import { getDataAPI } from './api';
@@ -449,53 +458,530 @@ export class OS_Processes extends React.Component {
     super(props);
 
     this.state = {
-      columns: [],
-      rows: []
+      columns: this.getColumns(),
+      rows: [],
+      selectedrow: {},
+      query: {},
+      searchColumn: 'all',
+      sortingColumns: null, // reference to the sorting columns
+      pagination: { // initial pagination settings
+        page: 1,
+        perPage: 100
+      },
+      allProcesses: '',
+      runningProcesses: '',
+      blockedProcesses: '',
+      sleepingProcesses: ''
+    };
+    this.onRow = this.onRow.bind(this);
+    this.onRowSelected = this.onRowSelected.bind(this);
+    this.onColumnChange = this.onColumnChange.bind(this);
+    this.onSearch = this.onSearch.bind(this);
+    this.onSelect = this.onSelect.bind(this);
+    this.onPerPage = this.onPerPage.bind(this);
+    this.onToggleColumn = this.onToggleColumn.bind(this);
+    this.onButtonSearch = this.onButtonSearch.bind(this);
+  }
+
+  componentDidMount() {
+    this.interval = setInterval(() => {
+      getDataAPI.all(this.updateResult, myConfig.base_url + '/utilities/onestop/getProcesses');
+    }, 5000); 
+  }
+
+  updateResult = (res) => {
+    let rows = this.renderRowData(res.data);
+    this.setState({rows});
+}
+
+componentWillUnmount() {
+  clearInterval(this.interval);
+}
+
+formatBytes(a,b){if(0===a)return'0 Bytes';var c=1024,d=b||2,e=['Bytes','KB','MB','GB','TB','PB','EB','ZB','YB'],f=Math.floor(Math.log(a)/Math.log(c));return parseFloat((a/Math.pow(c,f)).toFixed(d))+' ' +e[f];}
+
+renderRowData(data) {
+  var rowData = [];
+  var rows = {
+    id: '',
+    PID: '',
+    NAME: '',
+    COMMAND: '',
+    USER: '',
+    TTY: '',
+    STATE: '',
+    STARTED: '',
+    MEM_RSS: '',
+    MEM_VSZ: '',
+    PMEM: '',
+    PCPU: ''
+  };
+  this.setState({allProcesses: data.all});
+  this.setState({runningProcesses: data.running});
+  this.setState({blockedProcesses: data.blocked});
+  this.setState({sleepingProcesses: data.sleeping});
+
+  for (let i = 0; i < data.list.length; i++){
+    let row = data.list[i];
+
+    rows = {
+      id: i,
+      PID: row.pid,
+      NAME: row.name,
+      COMMAND: row.command,
+      USER: row.user,
+      TTY: row.tty,
+      STATE: row.state,
+      STARTED: row.started,
+      MEM_RSS: this.formatBytes(row.mem_rss, 2),
+      MEM_VSZ: this.formatBytes(row.mem_vsz, 2),
+      PMEM: row.pmem,
+      PCPU: parseFloat(row.pcpu.toPrecision(4)) 
+    };
+    rowData.push( rows );
+  }
+  return rowData;
+}
+
+getColumns() {
+  const sortable = sort.sort({
+    getSortingColumns: () => this.state.sortingColumns || [],
+    onSort: selectedColumn => {
+      this.setState({
+        sortingColumns: sort.byColumns({ 
+          sortingColumns: this.state.sortingColumns,
+          selectedColumn
+        })
+      });
+    }
+  });
+  const sortableHeader = sortHeader(sortable, () => this.state.sortingColumns);
+  const resize = resizable.column({
+    getWidth: column => column.header.props.style.width,
+    onDrag: (width, { columnIndex }) => {
+      const columns = this.state.columns;
+      const column = columns[columnIndex];
+
+      column.header.props.style = {
+        ...column.header.props.style,
+        width
+      };
+
+      this.setState({ columns });
+    }
+  });
+  return [
+    {
+      property: 'PID',
+      header: { label: 'PID',formatters: [ (v, extra) => resize(sortableHeader(v, extra), extra)],
+        props: { style: { width: 100 } } },
+      cell: { formatters: [ search.highlightCell ] },
+      visible: true
+    },
+    {
+    property: 'NAME',
+    header: { label: 'Name', formatters: [ (v, extra) => resize(sortableHeader(v, extra), extra) ],
+      props: { style: { width: 100 } } },
+    cell: { formatters: [ search.highlightCell ] },
+    visible: true
+  },
+  {
+    property: 'COMMAND',
+    header: { label: 'Command', formatters: [ (v, extra) => resize(sortableHeader(v, extra), extra) ],
+      props: { style: { width: 100 } } },
+    cell: { formatters: [ search.highlightCell ] },
+    visible: false
+  },
+  {
+    property: 'USER',
+    header: { label: 'User', formatters: [ (v, extra) => resize(sortableHeader(v, extra), extra) ],
+      props: { style: { width: 100 } } },
+    cell: { formatters: [ search.highlightCell ] },
+    visible: true
+  },
+  {
+    property: 'TTY',
+    header: { label: 'TTY', formatters: [ (v, extra) => resize(sortableHeader(v, extra), extra) ],
+      props: { style: { width: 100 } } },
+    cell: { formatters: [ search.highlightCell ] },
+    visible: true
+  },
+  {
+    property: 'STATE',
+    header: { label: 'State', formatters: [ (v, extra) => resize(sortableHeader(v, extra), extra) ],
+      props: { style: { width: 100 } } },
+    cell: { formatters: [ search.highlightCell ] },
+    visible: true
+  },
+  {
+    property: 'STARTED',
+    header: { label: 'Started', formatters: [ (v, extra) => resize(sortableHeader(v, extra), extra) ],
+      props: { style: { width: 100 } } },
+    cell: { formatters: [ search.highlightCell ] },
+    visible: true
+  },
+  {
+    property: 'MEM_RSS',
+    header: { label: 'RSS', formatters: [ (v, extra) => resize(sortableHeader(v, extra), extra) ],
+      props: { style: { width: 100 } } },
+    cell: { formatters: [ search.highlightCell ] },
+    visible: true
+  },
+  {
+    property: 'MEM_VSZ',
+    header: { label: 'VMS', formatters: [ (v, extra) => resize(sortableHeader(v, extra), extra) ],
+      props: { style: { width: 100 } } },
+    cell: { formatters: [ search.highlightCell ] },
+    visible: true
+  },
+  {
+    property: 'PMEM',
+    header: { label: '%Memory', formatters: [ (v, extra) => resize(sortableHeader(v, extra), extra) ],
+      props: { style: { width: 100 } } },
+    cell: { formatters: [ search.highlightCell ] },
+    visible: true
+  },
+  {
+    property: 'PCPU',
+    header: { label: '%CPU', formatters: [ (v, extra) => resize(sortableHeader(v, extra), extra) ],
+      props: { style: { width: 100 } } },
+    cell: { formatters: [ search.highlightCell ] },
+    visible: true
+  }  
+  ];
+}
+  render() {
+    const {
+      columns, rows, pagination, sortingColumns, searchColumn, query
+    } = this.state;
+    const cols = columns.filter(column => column.visible);
+    const paginated = compose(
+      paginate(pagination),
+      sort.sorter({ columns: cols, sortingColumns, sort: orderBy }),
+      search.highlighter({ columns: cols, matches: search.matches, query }),
+      search.multipleColumns({ columns: cols, query }),
+      resolve.resolve({
+        columns: cols,
+        method: (extra) => compose(
+          resolve.byFunction('cell.resolve')(extra),
+          resolve.nested(extra)
+        )
+      })
+    )(rows);
+
+    return(
+      <div>
+        <VisibilityToggles
+          columns={columns}
+          onToggleColumn={this.onToggleColumn}
+        />
+
+        {(
+          <div>
+          <Button onClick= {() => {this.onButtonSearch(''); }} outline color='primary' size='sm' >All:{this.state.allProcesses} </Button>
+          <Button onClick= {() => {this.onButtonSearch('running'); }} outline color='primary' size='sm' >Running:{this.state.runningProcesses} </Button>
+          <Button onClick= {() => {this.onButtonSearch('blocked'); }} outline color='primary' size='sm' >Blocked:{this.state.blockedProcesses} </Button>
+          <Button onClick= {() => {this.onButtonSearch('sleeping'); }} outline color='primary' size='sm' >Sleeping:{this.state.sleepingProcesses} </Button>
+          </div>       
+        )}
+
+        <PrimaryControls
+          className="controls"
+          perPage={pagination.perPage}
+          column={searchColumn}
+          query={query}
+          columns={cols}
+          rows={rows}
+          onPerPage={this.onPerPage}
+          onColumnChange={this.onColumnChange}
+          onSearch={this.onSearch}
+        />
+
+        <Table.Provider
+          className="pure-table pure-table-striped"
+          columns={cols}
+          style={{ overflowX: 'auto' }}
+        >
+          <Table.Header>
+            <search.Columns query={query} columns={cols} onChange={this.onSearch} />
+          </Table.Header>
+
+          <Table.Body onRow={this.onRow} rows={paginated.rows} rowKey="id" />
+
+        </Table.Provider>
+
+        <div className="controls">
+          <Paginator
+            pagination={pagination}
+            pages={paginated.amount}
+            onSelect={this.onSelect}
+          />
+        </div>
+
+      </div>
+    );
+  }
+  onToggleColumn({ columnIndex }) {
+    const columns = cloneDeep(this.state.columns);
+    const column = columns[columnIndex];
+
+    column.visible = !column.visible;
+
+    const query = cloneDeep(this.state.query);
+    delete query[column.property];
+
+    this.setState({ columns, query });
+  }
+
+  onButtonSearch(sort) {
+    const columns = cloneDeep(this.state.columns);
+    const column = columns[5];  // column 5 is the STATE column
+
+    const query = cloneDeep(this.state.query);
+    query[column.property] = sort;
+    this.setState({ query });
+
+    this.setState({ columns, query });
+  }
+
+  onRow(row) {
+    return {
+      onClick: () => this.onRowSelected(row)
+    };
+  }
+  onRowSelected(row) {
+    console.log('clicked row', row);
+    // this.setState({ showModal: true });
+    // this.setState({ selectedrow: row});
+  }
+  onColumnChange(searchColumn) {
+    this.setState({
+      searchColumn
+    });
+  }
+  onSearch(query) {
+    this.setState({
+      query
+    });
+  }
+  onSelect(page) {
+    const pages = Math.ceil(
+      this.state.rows.length / this.state.pagination.perPage
+    );
+
+    this.setState({
+      pagination: {
+        ...this.state.pagination,
+        page: Math.min(Math.max(page, 1), pages)
+      }
+    });
+  }
+  onPerPage(value) {
+    this.setState({
+      pagination: {
+        ...this.state.pagination,
+        perPage: parseInt(value, 10)
+      }
+    });
+  }
+
+}
+
+// getNetwork
+export class OS_Network extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      networkData: [],
+      networkStats: [],
+      networkConnection: [],
+      netcols: this.getNetworkCols(),
+      netrows: [],
+      netConncols: this.getNetworkConnCols(),
+      netConnrows: []
     };
   }
 
+  getNetworkCols() {
+    return [
+      { property: 'INT', header: { label: 'Interface' } },
+      { property: 'STATE', header: { label: 'State' } },
+      { property: 'IP4', header: { label: 'IP4' } },
+      { property: 'IP6', header: { label: 'IP6' } },
+      { property: 'SENT', header: { label: 'Bytes Sent' } },
+      { property: 'RCV', header: { label: 'Bytes Recv' } },
+      { property: 'RX', header: { label: 'RX/s' } },
+      { property: 'TX', header: { label: 'TX/s' } },
+      { property: 'MAC', header: { label: 'MAC' } }
+    ];
+  }
+
+  getNetworkConnCols() {
+    return [
+      { property: 'LOCADDR', header: { label: 'Local Address' } },
+      { property: 'LOCPORT', header: { label: 'Local Port' } },
+      { property: 'PEERADDR', header: { label: 'Peer Address' } },
+      { property: 'PEERPORT', header: { label: 'Peer Port' } },
+      { property: 'PROTOCOL', header: { label: 'Protocol' } },
+      { property: 'STATE', header: { label: 'State' } }
+    ];
+  }
+
+  componentDidMount() {
+    this.interval = setInterval(() => {
+      //autoPlay some for specific period of times or
+      // Do some stuff you want
+      getDataAPI.all(this.updateResult, myConfig.base_url + '/utilities/onestop/getNetwork');
+    }, 5000); 
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
+
+  updateResult = (res) => {
+    this.setState({networkData: res.data.network_data});
+    this.setState({networkStats: res.data.network_stats});
+    this.setState({networkConnection: res.data.network_connection});
+    this.renderRowData(res.data);
+}
+
+formatBytes(a,b){if(0===a)return'0 Bytes';var c=1024,d=b||2,e=['Bytes','KB','MB','GB','TB','PB','EB','ZB','YB'],f=Math.floor(Math.log(a)/Math.log(c));return parseFloat((a/Math.pow(c,f)).toFixed(d))+' ' +e[f];}
+
+renderRowData(data) {
+    // Network
+    let net = data.network_data;
+    var netrowData = [];
+    var netrow = {
+      id: '',
+      INT: '',
+      STATE: '',
+      IP4: '',
+      IP6: '',
+      SENT: '',
+      RCV: '',
+      RX: '',
+      TX: '',
+      MAC: ''
+    };
+
+    var count = 0;
+    for (let i = 0; i < net.length; i++){
+      let row = net[i];
+  
+      netrow = {
+        id: i,
+        INT: row.iface,
+        IP4: row.ip4,
+        IP6: row.ip6,
+        MAC: row.mac,
+        STATE: data.network_stats[count].operstate,
+        SENT: this.formatBytes(data.network_stats[count].tx, 2),
+        RCV: this.formatBytes(data.network_stats[count].rx, 2),
+        RX: parseFloat(data.network_stats[count].rx_sec).toPrecision(6),
+        TX: parseFloat(data.network_stats[count].tx_sec).toPrecision(6)
+      };
+      count++;
+      netrowData.push(netrow);
+    }
+    let netrows = netrowData;
+    this.setState({netrows});
+  
+    let netConn = data.network_connection;
+    var netrowConnData = [];
+    var netConnrow = {
+      id: '',
+      LOCADDR: '',
+      LOCPORT: '',
+      PEERADDR: '',
+      PEERPORT: '',
+      PROTOCOL: '',
+      STATE: ''
+    };
+
+    count = 0;
+    for (let i = 0; i < netConn.length; i++){
+      let row = netConn[i];
+  
+      netConnrow = {
+        id: i,
+        LOCADDR: row.localaddress,
+        LOCPORT: row.localport,
+        PEERADDR: row.peeraddress,
+        PEERPORT: row.peerport,
+        PROTOCOL: row.protocol,
+        STATE: row.state
+      };
+      count++;
+      netrowConnData.push(netConnrow);
+    }
+    let netConnrows = netrowConnData;
+    this.setState({netConnrows});
+}
+
   render() {
-    return(
+    const {  netcols, netrows, netConncols, netConnrows
+    } = this.state;
+
+
+    const stylingRenderers = {
+      body: {
+        cell: AlignedBodyCell // the one element we are overriding
+      }
+    };
+
+    return (
       <div>
+        <br/>
+        <br/>
+        <h6>Network Information</h6>
+        <Column flexGrow={1}>
+          <Row horizontal='center'>
+            <Table.Provider
+              className="pure-table pure-table-striped"
+              columns = {netcols }
+              renderers={stylingRenderers}
+              style={{ width: 1000 }}   >
+
+            <Table.Header ></Table.Header>
+          
+            <Table.Body rows={ netrows} rowKey="id" />
+            </Table.Provider>
+            </Row>
+        </Column>
+        <br/>
+        <h6>Network Connections</h6>
+        <Column flexGrow={1}>
+          <Row horizontal='center'>
+            <Table.Provider
+              className="pure-table pure-table-striped"
+              columns = {netConncols }
+              renderers={stylingRenderers}
+              style={{ width: 1000 }}   >
+
+            <Table.Header ></Table.Header>
+          
+            <Table.Body rows={ netConnrows} rowKey="id" />
+            </Table.Provider>
+            </Row>
+        </Column>
 
       </div>
     );
   }
 }
 
-export class OS_Network extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      columns: [],
-      rows: []
-    };
-  }
-
-  render() {
-    return(
-      <div></div>
-    );
-  }
-}
-
-export class OS_Disks extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      columns: [],
-      rows: []
-    };
-  }
-
-  render() {
-    return(
-      <div></div>
-    );
-  }
-}
+// '/apg/2100/dsw/os/log/*'
+// '/apg/admin/log/*'
+// '/apg/3rdParty/3mhis/gps/logs/*' 
+// '/apg/Healthcheck/log*'
+// '/apg/pdsdata/support/costing'
+// '/apg/pdsdata/support/di'
+// '/apg/pdsdata/support/enc_analysis'
+// '/apg/pdsdata/support/group_reimb'
+// '/apg/pdsdata/support/util'
+// '/apg/pdsdata/support/ws'
 
 export class OS_Logs extends React.Component {
   constructor(props) {
@@ -509,7 +995,19 @@ export class OS_Logs extends React.Component {
 
   render() {
     return(
-      <div></div>
+      <div>
+        <Button onClick= {() => {this.onButtonSearch(''); }} outline color='primary' size='sm' >OS Logs </Button>
+        <Button onClick= {() => {this.onButtonSearch(''); }} outline color='primary' size='sm' >Admin Logs </Button>
+        <Button onClick= {() => {this.onButtonSearch(''); }} outline color='primary' size='sm' >3M Logs </Button>
+        <Button onClick= {() => {this.onButtonSearch(''); }} outline color='primary' size='sm' >Healthcheck Logs </Button>
+        <Button onClick= {() => {this.onButtonSearch(''); }} outline color='primary' size='sm' >Costing Logs </Button>
+        <Button onClick= {() => {this.onButtonSearch(''); }} outline color='primary' size='sm' >DI Logs </Button>
+        <Button onClick= {() => {this.onButtonSearch(''); }} outline color='primary' size='sm' >Encounter Analysis Logs </Button>
+        <Button onClick= {() => {this.onButtonSearch(''); }} outline color='primary' size='sm' >G&R Logs </Button>
+        <Button onClick= {() => {this.onButtonSearch(''); }} outline color='primary' size='sm' >Utility Logs </Button>
+        <Button onClick= {() => {this.onButtonSearch(''); }} outline color='primary' size='sm' >WS Logs </Button>
+
+      </div>
     );
   }
 }
@@ -539,7 +1037,7 @@ export class OS_oracleTableSpace extends React.Component {
   }
 
   updateResult = (res) => {
-    this.renderRowData(res.data.rows)
+    this.renderRowData(res.data.rows);
 }
   
   renderRowData(data) {
@@ -601,6 +1099,35 @@ export class OS_oracleTableSpace extends React.Component {
   }
 }
 
+function sortHeader(sortable, getSortingColumns) {
+  return (value, { columnIndex }) => {
+    const sortingColumns = getSortingColumns() || [];
+
+    return (
+      <div style={{ display: 'inline' }}>
+        <span className="value">{value}</span>
+        {React.createElement(
+          'span',
+          sortable(
+            value,
+            {
+              columnIndex
+            },
+            {
+              style: { float: 'right' }
+            }
+          )
+        )}
+        {sortingColumns[columnIndex] &&
+          <span className="sort-order" style={{ marginLeft: '0.5em', float: 'right' }}>
+            {sortingColumns[columnIndex].position + 1}
+          </span>
+        }
+      </div>
+    );
+  };
+}
+
 
 
 export class OS_oracleParameters extends React.Component {
@@ -627,7 +1154,7 @@ export class OS_oracleParameters extends React.Component {
   }
 
   updateResult = (res) => {
-    this.renderRowData(res.data.rows)
+    this.renderRowData(res.data.rows);
 }
   
   renderRowData(data) {
@@ -710,7 +1237,7 @@ export class OS_oracleLongRunning extends React.Component {
   }
 
   updateResult = (res) => {
-    this.renderRowData(res.data.rows)
+    this.renderRowData(res.data.rows);
 }
   
   renderRowData(data) {
@@ -799,7 +1326,7 @@ export class OS_oracleQueryReservation extends React.Component {
   }
 
   updateResult = (res) => {
-    this.renderRowData(res.data.rows)
+    this.renderRowData(res.data.rows);
 }
   
   renderRowData(data) {
@@ -891,7 +1418,7 @@ export class OS_oracleGetAppliedRounds extends React.Component {
   }
 
   updateResult = (res) => {
-    this.renderRowData(res.data.rows)
+    this.renderRowData(res.data.rows);
 }
   
   renderRowData(data) {
@@ -972,7 +1499,7 @@ export class OS_oraclecheckRounds extends React.Component {
   }
 
   updateResult = (res) => {
-    this.renderRowData(res.data.rows)
+    this.renderRowData(res.data.rows);
 }
   
   renderRowData(data) {
@@ -1053,7 +1580,7 @@ export class OS_oraclecheckMaxProcesses extends React.Component {
   }
 
   updateResult = (res) => {
-    this.renderRowData(res.data.rows)
+    this.renderRowData(res.data.rows);
 }
   
   renderRowData(data) {
@@ -1139,7 +1666,7 @@ export class OS_oraclecheckGRStatus extends React.Component {
   }
 
   updateResult = (res) => {
-    this.renderRowData(res.data.rows)
+    this.renderRowData(res.data.rows);
 }
   
   renderRowData(data) {
@@ -1230,7 +1757,7 @@ export class OS_oraclecheckLocks extends React.Component {
   }
 
   updateResult = (res) => {
-    this.renderRowData(res.data.rows)
+    this.renderRowData(res.data.rows);
 }
   
   renderRowData(data) {
@@ -1324,7 +1851,7 @@ export class OS_oraclecheckActivity extends React.Component {
   }
 
   updateResult = (res) => {
-    this.renderRowData(res.data.rows)
+    this.renderRowData(res.data.rows);
 }
   
   renderRowData(data) {

@@ -213,6 +213,20 @@ exports.getFileSystemData = function (req, res, next) {
             next();
         })
         .catch(error => console.log(error));
+    
+    si.fsStats()
+        .then(data => {
+            DashBdData.fileSystemStats = data,
+            next();
+        })
+        .catch(error => console.log(error));
+
+    si.disksIO()
+        .then(data => {
+            DashBdData.diskIO = data,
+            next();
+        })
+        .catch(error => console.log(error));
 }
 
 // Get user information
@@ -272,10 +286,11 @@ exports.getCurrentSystemLoad = function (req, res, next) {
 // ...[0].tty	    tty from which process was started
 // ...[0].user		user who started process
 // ...[0].command  process starting command
+
 exports.getProcessData = function (req, res, next) {
     si.processes()
         .then(data => {
-            DashBdData.processes = data,
+            DashBdData.processes = data
             next();
         })
         .catch(error => console.log(error));
