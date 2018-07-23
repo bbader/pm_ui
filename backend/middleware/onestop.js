@@ -2,11 +2,12 @@
 
 var DashBdData = require("../models/onestop");
 var si         = require('systeminformation');
-var fs         = require('fs');
+var fs         = require('fs-extra');
 var convert    = require('convert-seconds');
 var format     = require('date-format');
 var converter  = require('byte-converter').converterBase10;
 var database   = require('./database.js');
+var shell      = require('shelljs');
 
 exports.getCPVer = function(req, res, next) {
     database.simpleExecute('select pds.latest() from dual ',
@@ -332,4 +333,39 @@ exports.getOSInfo = function (req, res, next) {
 }
 
 
+exports.adminCommands = function (req, res, next) {
+    shell.exec(req.body.shellCmd, function(code, stdout, stderr) {
+            var lines = stdout.split('\n');
+            // remove one line, starting at the first position
+            lines.splice(0,1);
+            // join the array back into a single string
+            var newtext = lines.join('\n');
+            DashBdData.shellCmdOutput = newtext  ;
+            next();
+      });
+}
+
+exports.adminRestartPM = function (req, res, next) {
+    var stopit = shell.exec('/apg/admin/bin/stop_db_app.sh');
+    var startit = shell.exec('/apg/admin/bin/start_db_app.sh');
+    DashBdData.shellCmdOutput = stopit + startit;
+    next();
+    // , function (code, stdout, stderr) {
+    //     var lines = stdout.split('\n');
+    //     // remove one line, starting at the first position
+    //     lines.splice(0,1);
+    //     // join the array back into a single string
+    //     var newtext = lines.join('\n');
+    //     DashBdData.shellCmdOutput = newtext  ;
+    //     shell.exec('/apg/admin/bin/start_db_app.sh', function (code, stdout, stderr) {
+    //         var lines = stdout.split('\n');
+    //         // remove one line, starting at the first position
+    //         lines.splice(0,1);
+    //         // join the array back into a single string
+    //         var newtext = lines.join('\n');
+    //         DashBdData.shellCmdOutput = DashBdData.shellCmdOutput + newtext  ;
+    //         next();
+    //     });
+    // });
+}
 module.exports = exports;

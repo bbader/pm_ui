@@ -71,7 +71,8 @@ function post(req, res, next) {
   
   
             res.status(200).json({
-              user: user
+              user: user,
+              currentVersion: process.env.DSW_CURRVERSION
             });
 
 

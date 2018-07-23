@@ -32,8 +32,7 @@ class LoginForm extends React.Component {
       this.handleChange = this.handleChange.bind(this);
   }
   
-  updateResultAuth = (res) => {
-
+  updateResultAuth = () => {
     history.push( '/listUsers' );
   }
 
@@ -73,10 +72,10 @@ class LoginForm extends React.Component {
   getStyles() {
       return {
           formContainer: {
-              width: "100%",
-              height: "100%",
-              position: "top",
-              background: "whitesmoke",
+              width: '100%',
+              height: '100%',
+              position: 'top',
+              background: 'whitesmoke',
               display: 'flex',
               flex: 1,
               flexDirection: 'column',
@@ -84,27 +83,27 @@ class LoginForm extends React.Component {
               justifyContent: 'center'
           },
           form: {
-              background: "#fff",
+              background: '#fff',
               padding: 20,
-              width: "50%",
-              height: "50%",
+              width: '50%',
+              height: '50%',
               display: 'flex',
               flex: 1,
               flexDirection: 'column',
-              boxShadow: "0px 0px 2px rgba(0,0,0,0.3)"
+              boxShadow: '0px 0px 2px rgba(0,0,0,0.3)'
           },
           input: {
-              width: "100%",
-              margin: "10px 0px",
-              padding: "10px 0px",
-              border: "none",
-              borderBottom: "solid 1px #1d84c3"
+              width: '100%',
+              margin: '10px 0px',
+              padding: '10px 0px',
+              border: 'none',
+              borderBottom: 'solid 1px #1d84c3'
           },
           button: {
-              background: "#1d84c3",
-              color: "#fff",
-              border: "none",
-              outline: "none",
+              background: '#1d84c3',
+              color: '#fff',
+              border: 'none',
+              outline: 'none',
               padding: 7
           }
       };

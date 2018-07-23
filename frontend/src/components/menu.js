@@ -102,6 +102,7 @@ export class Navigation extends React.Component {
       sessionStorage.setItem('token', user.token);
       sessionStorage.setItem('uname', user.username);
       sessionStorage.setItem('role', user.role);
+      sessionStorage.setItem('currentVersion', res.data.currentVersion);
       sessionStorage.setItem('isAuthenticated', true);
       tmpthis.setState({isLoggedIn: true});
       history.push( '/Home' );
@@ -121,7 +122,7 @@ export class Navigation extends React.Component {
       token: []
     };
 
-    var data = { name: user.username, password: user.password }
+    var data = { name: user.username, password: user.password };
     postDataAPI.all(this.updateResultAuth, myConfig.base_url + '/api/logins', data);  
   }
 
@@ -177,12 +178,14 @@ export class MyMenu extends React.Component {
       menuOpen: false,
       dropdownOpen: false,
       osdropdownOpen: false,
-      osoracledropdownOpen: false
+      osoracledropdownOpen: false,
+      osadmindropdownOpen: false
     };
 
     this.toggle = this.toggle.bind(this);
     this.toggleos = this.toggleos.bind(this);
     this.toggleosoracle = this.toggleosoracle.bind(this);
+    this.toggleosadmin = this.toggleosadmin.bind(this);
   }
 
   toggleos() {
@@ -197,6 +200,12 @@ export class MyMenu extends React.Component {
     });
   }
 
+  toggleosadmin() {
+    this.setState({
+      osadmindropdownOpen: !this.state.osadmindropdownOpen
+    });
+  }
+
   toggle() {
     this.setState({
       dropdownOpen: !this.state.dropdownOpen
@@ -207,6 +216,7 @@ export class MyMenu extends React.Component {
     this.setState({dropdownOpen: false});
     this.setState({osdropdownOpen: false});
     this.setState({osoracledropdownOpen: false});
+    this.setState({osadmindropdownOpen: false});
   }
 
   render () {
@@ -215,8 +225,8 @@ export class MyMenu extends React.Component {
     let addUserButton, listUserButton;
     // console.log (isLoggedIn + '     ' + userRole);
     if (isLoggedIn && userRole === 'ADMIN') {
-      addUserButton = <DropdownItem><NavLink  className="nav-link dropdown-item" to="/addUser"> <FontAwesomeIcon icon={faEye}/> Add User  </NavLink> </DropdownItem>
-      listUserButton = <DropdownItem><NavLink  className="nav-link dropdown-item" to="/listUsers"> <FontAwesomeIcon icon={faEye}/> List Users  </NavLink> </DropdownItem>
+      addUserButton = <DropdownItem><NavLink  className="nav-link dropdown-item" to="/addUser"> <FontAwesomeIcon icon={faEye}/> Add User  </NavLink> </DropdownItem>;
+      listUserButton = <DropdownItem><NavLink  className="nav-link dropdown-item" to="/listUsers"> <FontAwesomeIcon icon={faEye}/> List Users  </NavLink> </DropdownItem>;
     }
 
     return (
@@ -309,8 +319,8 @@ export class MyMenu extends React.Component {
                     <DropdownItem><NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/OS_oraclecheckActivity" > <FontAwesomeIcon icon={faDatabase}/> Check Oracle Activity  </NavLink> </DropdownItem>
                   </DropdownMenu>
                 </Dropdown>
-
                 <DropdownItem><NavLink onClick={() => this.closeMenu()} className="nav-link dropdown-item" to="/OS_Admin" > <FontAwesomeIcon icon={faUserSecret}/> Admin  </NavLink> </DropdownItem>
+
               </DropdownMenu>
           </Dropdown>
 

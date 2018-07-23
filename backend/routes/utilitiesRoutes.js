@@ -8,6 +8,12 @@ var oracleQueries = require("../middleware/oracleQueries");
 var customObject = require("../middleware/customobject");
 var pmUsers = require("../middleware/pmusers");
 var jobViewerUtils = require("../middleware/jobViewerUtils");
+var logs = require("../middleware/logs");
+
+const { getLogFileList } = logs;
+router.post("/getLogFileList", getLogFileList, function (req, res) {
+    return res.status(200).json(DashBdData.logFiles);
+});
 
 const { JV_DeleteJob } = jobViewerUtils;
 

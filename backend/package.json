@@ -22,11 +22,12 @@
     "express": "^4.16.3",
     "express-sanitizer": "^1.0.4",
     "express-session": "^1.15.6",
-    "fs": "0.0.1-security",
+    "fs-extra": "^7.0.0",
     "jsonwebtoken": "^8.3.0",
     "method-override": "^2.3.10",
     "middleware": "^1.0.0",
     "oracledb": "^2.3.0",
+    "shelljs": "^0.8.2",
     "systeminformation": "^3.38.0"
   },
   "devDependencies": {

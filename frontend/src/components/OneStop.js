@@ -12,7 +12,8 @@ import VisibilityToggles from 'react-visibility-toggles';
 import { Paginator, PrimaryControls, paginate } from '../helpers';
 import { Column, Row } from 'simple-flexbox';
 import { myConfig } from '../config';
-import { getDataAPI } from './api';
+import { getDataAPI, postDataAPI } from './api';
+import history from '../history';
 
 const AlignedBodyCell = styled.td`
   text-align: ${props => props.isNumber ? 'right' : 'left'};
@@ -750,9 +751,7 @@ getColumns() {
     };
   }
   onRowSelected(row) {
-    console.log('clicked row', row);
-    // this.setState({ showModal: true });
-    // this.setState({ selectedrow: row});
+    this.setState({ selectedrow: row});
   }
   onColumnChange(searchColumn) {
     this.setState({
@@ -972,44 +971,250 @@ renderRowData(data) {
   }
 }
 
-// '/apg/2100/dsw/os/log/*'
-// '/apg/admin/log/*'
-// '/apg/3rdParty/3mhis/gps/logs/*' 
-// '/apg/Healthcheck/log*'
-// '/apg/pdsdata/support/costing'
-// '/apg/pdsdata/support/di'
-// '/apg/pdsdata/support/enc_analysis'
-// '/apg/pdsdata/support/group_reimb'
-// '/apg/pdsdata/support/util'
-// '/apg/pdsdata/support/ws'
-
 export class OS_Logs extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      columns: [],
-      rows: []
+      columns: this.getColumns(),
+      rows: [],
+      selectedrow: {},
+      query: {},
+      searchColumn: '',
+      sortingColumns: null, // reference to the sorting columns
+      pagination: { // initial pagination settings
+        page: 1,
+        perPage: 100
+      }, 
+      currentDir: ''
     };
+    this.openLog = this.openLog.bind(this);
+    this.onToggleColumn = this.onToggleColumn.bind(this);
+    this.onRow = this.onRow.bind(this);
+    this.onRowSelected = this.onRowSelected.bind(this);
+    this.onColumnChange = this.onColumnChange.bind(this);
+    this.onSearch = this.onSearch.bind(this);
+    this.onSelect = this.onSelect.bind(this);
+    this.onPerPage = this.onPerPage.bind(this);
+
+    this.getLogFileList = this.getLogFileList.bind(this);
+    this.updateGetListResult = this.updateGetListResult.bind(this);
+  }
+
+  getLogFileList (dir) {
+    this.setState({currentDir: dir});
+    var data = { 
+      directory: dir
+     };
+    postDataAPI.all(this.updateGetListResult, myConfig.base_url + '/utilities/getLogFileList', data );
+  }
+
+  updateGetListResult = (res) => {
+    let rows = this.renderRowData(res.data);
+    this.setState({rows});
+  }
+
+  formatBytes(a,b){if(0===a)return'0 Bytes';var c=1024,d=b||2,e=['Bytes','KB','MB','GB','TB','PB','EB','ZB','YB'],f=Math.floor(Math.log(a)/Math.log(c));return parseFloat((a/Math.pow(c,f)).toFixed(d))+' ' +e[f];}
+
+  renderRowData(data) {
+    var rowData = [];
+    var rows = {
+      id: '',
+      FILENAME: '',
+      NAME: '',
+      MTIME: '',
+      ATIME: ''
+    };
+
+    for (let i = 0; i < data.length; i++){
+      let row = data[i];
+  
+      rows = {
+        id: i,
+        FILENAME: row.filename,
+        NAME: row.stats.name,
+        SIZE: row.stats.size,
+        MTIME: new Date(row.stats.mtime),
+        ATIME: new Date(row.stats.atime)
+      };
+      rowData.push( rows );
+    }
+    return rowData;  
+  }
+
+  getColumns() {
+    const sortable = sort.sort({
+      getSortingColumns: () => this.state.sortingColumns || [],
+      onSort: selectedColumn => { this.setState({ sortingColumns: sort.byColumns({ 
+            sortingColumns: this.state.sortingColumns, selectedColumn }) }); } });
+    const sortableHeader = sortHeader(sortable, () => this.state.sortingColumns);
+    const resize = resizable.column({ getWidth: column => column.header.props.style.width,
+      onDrag: (width, { columnIndex }) => { const columns = this.state.columns;
+        const column = columns[columnIndex]; column.header.props.style = { ...column.header.props.style, width };
+        this.setState({ columns }); } });
+    return [
+      {
+        property: 'FILENAME',
+        header: { label: 'Name',formatters: [ (v, extra) => resize(sortableHeader(v, extra), extra)],
+          props: { style: { width: 100 } } },
+        cell: { formatters: [ search.highlightCell ] },
+        visible: true
+      },
+      {
+      property: 'SIZE',
+      header: { label: 'Size',formatters: [ (v, extra) => resize(sortableHeader(v, extra), extra)],
+        props: { style: { width: 100 } } },
+      cell: { formatters: [ search.highlightCell ] },
+      visible: true
+    },
+    {
+      property: 'MTIME',
+      header: { label: 'Modify Time',formatters: [ (v, extra) => resize(sortableHeader(v, extra), extra)],
+        props: { style: { width: 100 } } },
+      cell: { formatters: [ search.highlightCell ] },
+      visible: true
+    },
+    {
+      property: 'ATIME',
+      header: { label: 'Access Time',formatters: [ (v, extra) => resize(sortableHeader(v, extra), extra)],
+        props: { style: { width: 100 } } },
+      cell: { formatters: [ search.highlightCell ] },
+      visible: true
+    }
+    ];
   }
 
   render() {
+    const {
+      columns, rows, pagination, sortingColumns, searchColumn, query
+    } = this.state;
+    const cols = columns.filter(column => column.visible);
+    const paginated = compose(
+      paginate(pagination),
+      sort.sorter({ columns: cols, sortingColumns, sort: orderBy }),
+      search.highlighter({ columns: cols, matches: search.matches, query }),
+      search.multipleColumns({ columns: cols, query }),
+      resolve.resolve({
+        columns: cols,
+        method: (extra) => compose(
+          resolve.byFunction('cell.resolve')(extra),
+          resolve.nested(extra)
+        )
+      })
+    )(rows);
+
     return(
       <div>
-        <Button onClick= {() => {this.onButtonSearch(''); }} outline color='primary' size='sm' >OS Logs </Button>
-        <Button onClick= {() => {this.onButtonSearch(''); }} outline color='primary' size='sm' >Admin Logs </Button>
-        <Button onClick= {() => {this.onButtonSearch(''); }} outline color='primary' size='sm' >3M Logs </Button>
-        <Button onClick= {() => {this.onButtonSearch(''); }} outline color='primary' size='sm' >Healthcheck Logs </Button>
-        <Button onClick= {() => {this.onButtonSearch(''); }} outline color='primary' size='sm' >Costing Logs </Button>
-        <Button onClick= {() => {this.onButtonSearch(''); }} outline color='primary' size='sm' >DI Logs </Button>
-        <Button onClick= {() => {this.onButtonSearch(''); }} outline color='primary' size='sm' >Encounter Analysis Logs </Button>
-        <Button onClick= {() => {this.onButtonSearch(''); }} outline color='primary' size='sm' >G&R Logs </Button>
-        <Button onClick= {() => {this.onButtonSearch(''); }} outline color='primary' size='sm' >Utility Logs </Button>
-        <Button onClick= {() => {this.onButtonSearch(''); }} outline color='primary' size='sm' >WS Logs </Button>
+        <Button onClick= {() => {this.getLogFileList('/apg/' + sessionStorage.getItem('currentVersion') + '/dsw/os/log'); }} outline color='primary' size='sm' >OS Logs </Button>
+        <Button onClick= {() => {this.getLogFileList('/apg/admin/log');  }} outline color='primary' size='sm' >Admin Logs </Button>
+        <Button onClick= {() => {this.getLogFileList('/apg/3rdParty/3mhis/gps/logs'); }} outline color='primary' size='sm' >3M Logs </Button>
+        <Button onClick= {() => {this.getLogFileList('/apg/Healthcheck/log'); }} outline color='primary' size='sm' >Healthcheck Logs </Button>
+        <Button onClick= {() => {this.getLogFileList('/apg/pdsdata/support/costing'); }} outline color='primary' size='sm' >Costing Logs </Button>
+        <Button onClick= {() => {this.getLogFileList('/apg/pdsdata/support/di'); }} outline color='primary' size='sm' >DI Logs </Button>
+        <Button onClick= {() => {this.getLogFileList('/apg/pdsdata/support/enc_analysis'); }} outline color='primary' size='sm' >Encounter Analysis Logs </Button>
+        <Button onClick= {() => {this.getLogFileList('/apg/pdsdata/support/group_reimb'); }} outline color='primary' size='sm' >G&R Logs </Button>
+        <Button onClick= {() => {this.getLogFileList('/apg/pdsdata/support/util'); }} outline color='primary' size='sm' >Utility Logs </Button>
+        <Button onClick= {() => {this.getLogFileList('/apg/pdsdata/support/ws'); }} outline color='primary' size='sm' >WS Logs </Button>
+
+        <VisibilityToggles
+          columns={columns}
+          onToggleColumn={this.onToggleColumn}
+        />
+        <PrimaryControls
+          className="controls"
+          perPage={pagination.perPage}
+          column={searchColumn}
+          query={query}
+          columns={cols}
+          rows={rows}
+          onPerPage={this.onPerPage}
+          onColumnChange={this.onColumnChange}
+          onSearch={this.onSearch}
+        />
+
+        <Table.Provider
+          className="pure-table pure-table-striped"
+          columns={cols}
+          style={{ overflowX: 'auto' }}
+        >
+          <Table.Header>
+            <search.Columns query={query} columns={cols} onChange={this.onSearch} />
+          </Table.Header>
+
+          <Table.Body onRow={this.onRow} rows={paginated.rows} rowKey="id" />
+
+        </Table.Provider>
+
+        <div className="controls">
+          <Paginator
+            pagination={pagination}
+            pages={paginated.amount}
+            onSelect={this.onSelect}
+          />
+        </div>
 
       </div>
     );
   }
+
+  openLog(link) {
+    history.push( {
+      pathname: 'showlog',
+      link: link
+      });
+  }
+
+  onToggleColumn({ columnIndex }) {
+    const columns = cloneDeep(this.state.columns);
+    const column = columns[columnIndex];
+
+    column.visible = !column.visible;
+
+    const query = cloneDeep(this.state.query);
+    delete query[column.property];
+
+    this.setState({ columns, query });
+  }
+
+  onRow(row) {
+    return {
+      onClick: () => this.onRowSelected(row)
+    };
+  }
+  onRowSelected(row) {
+    this.openLog(myConfig.base_url + myConfig.log_url + this.state.currentDir + '/' + row.FILENAME);
+  }
+  onColumnChange(searchColumn) {
+    this.setState({
+      searchColumn
+    });
+  }
+  onSearch(query) {
+    this.setState({
+      query
+    });
+  }
+  onSelect(page) {
+    const pages = Math.ceil(
+      this.state.rows.length / this.state.pagination.perPage
+    );
+
+    this.setState({
+      pagination: {
+        ...this.state.pagination,
+        page: Math.min(Math.max(page, 1), pages)
+      }
+    });
+  }
+  onPerPage(value) {
+    this.setState({
+      pagination: {
+        ...this.state.pagination,
+        perPage: parseInt(value, 10)
+      }
+    });
+  }
+
 }
 
 export class OS_oracleTableSpace extends React.Component {
@@ -1913,19 +2118,108 @@ export class OS_oraclecheckActivity extends React.Component {
   }
 }
 
+// Batch Runner Status
+// Stop Batch Runner
+// Start Batch Runner
+
+
+/* <a id="batchRunnerStatus" href="http://hpmdb:8090/pm/HPMBatchRunner?cmd=status"><button type="button" class="btn btn-primary">Batch Runner Status</button></a>
+<script>
+  function myFunction() {
+    var result = (window.document.URL.split(/http:\/\//))[1].split(/:[0-9]/, 1);
+    return (result);
+  }
+  document.getElementById("batchRunnerStatus").href = "http://" + myFunction() + ":8090/pm/HPMBatchRunner?cmd=status";
+</script>
+
+        </div>
+    </div>
+    <div class="box">
+        <div class="box-header">
+<span>Stop Batch Runner</span>
+        </div>
+        <div class="box-content">
+            <a id="batchRunnerStop" href="http://hpmdb:8090/pm/HPMBatchRunner?cmd=status"><button type="button" class="btn btn-primary">Stop Batch Runner</button></a>
+            <script>
+                    function myFunction() {
+                            var result = (window.document.URL.split(/http:\/\//))[1].split(/:[0-9]/, 1);
+                            return (result);
+                    }
+                    document.getElementById("batchRunnerStop").href = "http://" + myFunction() + ":8090/pm/HPMBatchRunner?cmd=stop";
+            </script>
+        </div>
+    </div>
+    <div class="box">
+        <div class="box-header">
+            <span>Start Batch Runner</span>
+        </div>
+        <div class="box-content">
+            <a id="batchRunnerStart" href="http://hpmdb:8090/pm/HPMBatchRunner?cmd=status"><button type="button" class="btn btn-primary">Start Batch Runner</button></a>
+            <script>
+                    function myFunction() {
+                            var result = (window.document.URL.split(/http:\/\//))[1].split(/:[0-9]/, 1);
+                            return (result);
+                    }
+                    document.getElementById("batchRunnerStart").href = "http://" + myFunction() + ":8090/pm/HPMBatchRunner?cmd=start";
+            </script>
+        </div> */
+
 export class OS_Admin extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      columns: [],
-      rows: []
+      data: ''
     };
+    this.updateResult = this.updateResult.bind(this);
   }
 
+  doAdminStuff(cmd) {
+    var data = {
+      shellCmd: cmd
+    };
+    postDataAPI.all(this.updateResult, myConfig.base_url + '/utilities/onestop/adminCommands', data);
+  }
+
+  updateResult = (res) => {
+    this.setState({data: res.data});
+}
+
+restartPM() {
+  getDataAPI.all(this.updateResult, myConfig.base_url + '/utilities/onestop/adminRestartPM');
+}
+
   render() {
+    const isLoggedIn = sessionStorage.getItem('isAuthenticated'),
+    userRole   = sessionStorage.getItem('role');
+    let restartPMBtn, stopDbAppBtn, startDbAppBtn, stopAppBtn, startAppBtn, fixRecBtn;
+    if (isLoggedIn && userRole === 'ADMIN') {
+      restartPMBtn = <Button onClick= {() => {this.restartPM(); }} outline color='primary' size='sm' >Restart PM </Button>;
+      stopDbAppBtn = <Button onClick= {() => {this.doAdminStuff('/apg/admin/bin/stop_db_app.sh'); }} outline color='primary' size='sm' >Stop DB and App </Button>;
+      startDbAppBtn = <Button onClick= {() => {this.doAdminStuff('/apg/admin/bin/start_db_app.sh'); }} outline color='primary' size='sm' >Start DB and App </Button>;
+      stopAppBtn = <Button onClick= {() => {this.doAdminStuff('/apg/admin/bin/stop_app.sh'); }} outline color='primary' size='sm' >Stop App </Button>;
+      startAppBtn = <Button onClick= {() => {this.doAdminStuff('/apg/admin/bin/start_app.sh'); }} outline color='primary' size='sm' >Start App </Button>;
+      fixRecBtn = <Button onClick= {() => {this.doAdminStuff('/apg/admin/bin/fix_recurring_jobs'); }} outline color='primary' size='sm' >Fix Recurring Jobs </Button>;
+    }
+
     return(
-      <div></div>
+      <div style={{textAlign: 'initial', whiteSpace: 'pre-line' }} >
+      <br/>
+        {restartPMBtn}
+        <Button onClick= {() => {this.doAdminStuff('/apg/admin/bin/check_db_app.sh'); }} outline color='primary' size='sm' >Check DB and App </Button>
+        {stopDbAppBtn}
+        {startDbAppBtn}
+        {stopAppBtn}
+        {startAppBtn}
+        {fixRecBtn}
+      <hr/>
+      <h6>Please wait for the commands to print their status, some take time to perform the operation</h6>
+      <hr/>
+        <br/><br/>
+        <pre>
+          {this.state.data}
+        </pre>
+      </div>
     );
   }
 }

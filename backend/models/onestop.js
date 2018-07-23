@@ -26,7 +26,9 @@ var data = {
     diskInfo: {},
     osInfo: {},
     sqlMetadata: String,
-    sqlResult: String
+    sqlResult: String,
+    logFiles: {},
+    shellCmdOutput: String
 };
 
 module.exports = data ;

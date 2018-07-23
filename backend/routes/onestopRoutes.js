@@ -20,8 +20,17 @@ var middleware2 = require("../middleware/oracleQueries");
 // getOSInfo
 
 
-const {  getCPVer, getCurrentTime, getCpuData, getPMVer, getMemData, getFileSystemData, getOSInfo, getLoadData, getNetworkData, getNetworkConnectionData, getUserData, getProcessData } = middleware; // destructuring assignment
+
+const {  getCPVer, getCurrentTime, getCpuData, getPMVer, getMemData, getFileSystemData, getOSInfo, getLoadData, getNetworkData, getNetworkConnectionData, getUserData, getProcessData, adminCommands, adminRestartPM } = middleware; // destructuring assignment
 const { getTableSpace, getParameters, getLongRunningQueries, getReservationTable, getAppliedRounds, checkRounds, checkMaxProcesses, checkGRStatus, checkLocks, checkActivity } = middleware2;
+
+router.get("/adminRestartPM", adminRestartPM, function (req, res) {
+    return res.status(200).json(DashBdData.shellCmdOutput);
+});
+
+router.post("/adminCommands", adminCommands,  function (req, res) {
+    return res.status(200).json(DashBdData.shellCmdOutput);
+});
 
 router.get("/dashboard", getCPVer, getNetworkData, getCurrentTime, getCpuData, getPMVer, getMemData, getFileSystemData, getOSInfo, getLoadData, getUserData, function (req, res) {
     res.render("utilities/onestop/dashboard", { data: DashBdData });
