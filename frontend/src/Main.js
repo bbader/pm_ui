@@ -17,6 +17,7 @@ import {PMUsers} from './components/PMUsers';
 import {Logout} from './components/logout';
 import {addUser} from './components/addUser';
 import {listUsers} from './components/listUsers';
+import {updateUser} from './components/updateUser';
 
 
 import history from './history';
@@ -39,6 +40,7 @@ const Main = () => (
 
       <PrivateRoute exact path="/addUser" component={addUser}/>
       <PrivateRoute exact path="/listUsers" component={listUsers}/>
+      <PrivateRoute exact path="/updateUser" component={updateUser}/>
 
 
       <PrivateRoute exact path="/OS_Dashboard" component={OS_Dashboard}/>

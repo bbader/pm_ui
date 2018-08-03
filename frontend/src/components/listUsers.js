@@ -2,14 +2,15 @@
 import React from 'react';
 import { compose } from 'redux';
 import { cloneDeep, findIndex, orderBy } from 'lodash';
-import * as Table from 'reactabular-table';
-import * as search from 'searchtabular';
-import * as sort from 'sortabular';
-import * as resizable from 'reactabular-resizable';
-import * as resolve from 'table-resolver';
-import VisibilityToggles from 'react-visibility-toggles';
+import * as Table from 'reactabular-table/dist';
+import * as search from 'searchtabular/dist';
+import * as sort from 'sortabular/dist';
+import * as resizable from 'reactabular-resizable/dist';
+import * as resolve from 'table-resolver/dist';
+import VisibilityToggles from 'react-visibility-toggles/dist';
 import { Paginator, PrimaryControls, paginate } from '../helpers';
 import { Column, Row } from 'simple-flexbox';
+import history from '../history';
 
 import { getDataAPI } from './api';
 import { postDataAPI } from './api';
@@ -123,7 +124,7 @@ renderRowData(data) {
     {
       property: 'NAME',
       header: {
-        label: 'Name',
+        label: 'User Name',
         formatters: [ (v, extra) => resize(sortableHeader(v, extra), extra) ],
         props: { style: { width: 100 } } },
       cell: { formatters: [ search.highlightCell ] },
@@ -213,6 +214,7 @@ renderRowData(data) {
           onColumnChange={this.onColumnChange}
           onSearch={this.onSearch}
         />
+            <h6>To update user information, <strong>except username</strong>, click the row for the user.</h6>
 
         <Column flexGrow={1}>
           <Row horizontal='center'>
@@ -262,6 +264,11 @@ renderRowData(data) {
   onRowSelected(row) {
     // console.log('clicked row', row);
     this.setState({ selectedrow: row});
+    history.push( {
+      pathname: 'updateUser', 
+      state: {selectedrow: row}
+      });
+
   }
   onColumnChange(searchColumn) {
     this.setState({

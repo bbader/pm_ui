@@ -3,33 +3,38 @@ import React from 'react';
 import { postDataAPI } from './api';
 import { myConfig } from '../config';
 import history from '../history';
+import PropTypes from 'prop-types';
 
-export class addUser extends React.Component {
+export class updateUser extends React.Component {
   render() {
       return (
         <div>
           <br/>
-          <LoginForm>
+          <LoginForm location={this.props.location} >
           </LoginForm>
         </div>
       );
   }
 }
 
-class LoginForm extends React.Component {
+updateUser.propTypes = {
+    location: PropTypes.object
+  };
+  
+class LoginForm extends React.Component {    
   constructor(props) {
       super(props);
-      
       this.state = {
-        fullName: '',
-        username: '',
+        fullName: this.props.location.state.selectedrow.FULLNAME,
+        username: this.props.location.state.selectedrow.NAME,
         password: '',
-        role: '',
-        email: '',
-        department: ''
+        role: this.props.location.state.selectedrow.ROLE,
+        email: this.props.location.state.selectedrow.EMAIL,
+        department: this.props.location.state.selectedrow.DEPARTMENT
       };
 
       this.handleChange = this.handleChange.bind(this);
+      this.handleSubmit = this.handleSubmit.bind(this);
   }
   
   updateResultAuth = () => {
@@ -46,10 +51,15 @@ class LoginForm extends React.Component {
         password: this.state.password ,
         role: this.state.role.toUpperCase() ,
         email: this.state.email ,
-        department: this.state.department 
+        department: this.state.department,
+        type: ''
       };
 
+      let type;
+      if (user.password === '') { type = 'updateUser'; } else { type = 'updateWithPassword'; }
+
       var data = {
+        type: type,
         fullname: user.fullName,
         name: user.username,
         password: user.password ,
@@ -57,8 +67,8 @@ class LoginForm extends React.Component {
         email: user.email, 
         department: user.department
       };
+    //   console.log(data);
       postDataAPI.all(this.updateResultAuth, myConfig.base_url + '/api/users', data);  
-  
   }
   
   handleChange(e) {
@@ -112,12 +122,12 @@ class LoginForm extends React.Component {
   renderForm() {
       return (
           <form style={this.getStyles().form} onSubmit={this.handleSubmit.bind(this)}>
-              <input style={this.getStyles().input} placeholder="Full Name" type="text" name="fullName" onChange={this.handleChange}></input>
-              <input style={this.getStyles().input} placeholder="User Name" type="text" name="username" onChange={this.handleChange}></input>
+              <input style={this.getStyles().input} placeholder={this.state.fullName} type="text" name="fullName" onChange={this.handleChange}></input>
+              <input style={this.getStyles().input} placeholder="User Name, can't change" type="text" name="username" ></input>
               <input style={this.getStyles().input} placeholder="Password" type="password" name="password" onChange={this.handleChange}></input>
-              <input style={this.getStyles().input} placeholder="Role" type="text" name="role" onChange={this.handleChange}></input>
-              <input style={this.getStyles().input} placeholder="email" type="text" name="email" onChange={this.handleChange}></input>
-              <input style={this.getStyles().input} placeholder="Department" type="text" name="department" onChange={this.handleChange}></input>
+              <input style={this.getStyles().input} placeholder={this.state.role} type="text" name="role" onChange={this.handleChange}></input>
+              <input style={this.getStyles().input} placeholder={this.state.email} type="text" name="email" onChange={this.handleChange}></input>
+              <input style={this.getStyles().input} placeholder={this.state.department} type="text" name="department" onChange={this.handleChange}></input>
 
               <button style={this.getStyles().button} type="submit">Submit</button>
           </form>
@@ -132,3 +142,7 @@ class LoginForm extends React.Component {
       );
   }
 }
+
+LoginForm.propTypes = {
+    location: PropTypes.object
+};

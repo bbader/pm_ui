@@ -20,7 +20,7 @@ import { myConfig } from '../config';
 import history from '../history';
 import PropTypes from 'prop-types';
 import bcrypt from 'bcryptjs';
-import jwt from'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { postDataAPI } from './api';
 
 import { 

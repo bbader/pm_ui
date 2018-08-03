@@ -24,7 +24,6 @@ module.exports.get = get;
 
 
 function post(req, res, next) {
-
   if (req.body.type === "delete") {
     deleteUser(req.body.userid, function (err, user) {
       if (err) {
@@ -35,38 +34,26 @@ function post(req, res, next) {
       });
     });
   }
-  else {
-  var user = {
-    fullname: req.body.fullname,
-    name: req.body.name,
-    role: req.body.role,
-    email: req.body.email,
-    department: req.body.department
-  };
-  var unhashedPassword = req.body.password;
+  else if (req.body.type === "updateWithPassword") {
+    var user = {
+      fullname: req.body.fullname,
+      name: req.body.name,
+      role: req.body.role,
+      email: req.body.email,
+      department: req.body.department
+    };
+    var unhashedPassword = req.body.password;
+    bcrypt.genSalt(10, function (err, salt) {
+      if (err) { return next(err); }
 
-  bcrypt.genSalt(10, function (err, salt) {
-    if (err) {
-      return next(err);
-    }
-
-    bcrypt.hash(unhashedPassword, salt, function (err, hash) {
-      if (err) {
-        return next(err);
-      }
-
-      user.hashedPassword = hash;
-      if (req.body.type === "update") {
+      bcrypt.hash(unhashedPassword, salt, function (err, hash) {
+        user.hashedPassword = hash;
         updatePassword(user, function (err, user) {
           var payload;
   
-          if (err) {
-            return next(err);
-          }
+          if (err) { return next(err); }
   
-          payload = {
-            sub: user.name
-          };
+          payload = { sub: user.name };
   
           res.status(200).json({
             user: user,
@@ -75,30 +62,84 @@ function post(req, res, next) {
             })
           });
         });
-      } else {
-        insertUser(user, function (err, user) {
-          var payload;
-  
-          if (err) {
-            return next(err);
-          }
-  
-          payload = {
-            sub: user.name,
-            role: user.role
-          };
-  
-          res.status(200).json({
-            user: user,
-            token: jwt.sign(payload, config.jwtSecretKey, {
-              expiresIn: 60 * 60
-            })
-          });
-        });
-      }
+      });
+    });  
+  } 
+  else if (req.body.type === "updateUser") {
+    var user = {
+      fullname: req.body.fullname,
+      name: req.body.name,
+      role: req.body.role,
+      email: req.body.email,
+      department: req.body.department
+    };
+    updateUser(user, function (err, user) {
+      var payload;
+
+      if (err) { return next(err); }
+
+      payload = { sub: user.name };
+
+      res.status(200).json({
+        user: user,
+        token: jwt.sign(payload, config.jwtSecretKey, {
+          expiresIn: 60 * 60
+        })
+      });
     });
-  });
-}
+  }
+
+//   else {
+//   var user = {
+//     fullname: req.body.fullname,
+//     name: req.body.name,
+//     role: req.body.role,
+//     email: req.body.email,
+//     department: req.body.department
+//   };
+//   var unhashedPassword = req.body.password;
+
+//   bcrypt.genSalt(10, function (err, salt) {
+//     if (err) { return next(err); }
+
+//     bcrypt.hash(unhashedPassword, salt, function (err, hash) {
+//       if (err) { return next(err); }
+
+//       user.hashedPassword = hash;
+//       if (req.body.type === "update") {
+//         updatePassword(user, function (err, user) {
+//           var payload;
+  
+//           if (err) { return next(err); }
+  
+//           payload = { sub: user.name };
+  
+//           res.status(200).json({
+//             user: user,
+//             token: jwt.sign(payload, config.jwtSecretKey, {
+//               expiresIn: 60 * 60
+//             })
+//           });
+//         });
+//       } else {
+//         insertUser(user, function (err, user) {
+//           var payload;
+  
+//           if (err) { return next(err); }
+  
+//           payload = { sub: user.name, role: user.role};
+  
+//           res.status(200).json({
+//             user: user,
+//             token: jwt.sign(payload, config.jwtSecretKey, {
+//               expiresIn: 60 * 60
+//             })
+//           });
+//         });
+//       }
+//     });
+//   });
+// }
 }
 
 module.exports.post = post;
@@ -194,9 +235,56 @@ function updatePassword(user, cb) {
       }
 
       connection.execute(
-        'update jsao_users set password = :password where name = :name', {
+        'update jsao_users set password = :password, role = :role, fullname = :fullname, email = :email, department = :department where name = :name', {
           name: user.name.toLowerCase(),
-          password: user.hashedPassword
+          password: user.hashedPassword,
+          role: user.role.toUpperCase(),
+          fullname: user.fullname,
+          email: user.email,
+          department: user.department,
+        }, {
+          autoCommit: true
+        },
+        function (err, results) {
+          if (err) {
+            connection.release(function (err) {
+              if (err) {
+                console.error(err.message);
+              }
+            });
+
+            return cb(err);
+          }
+
+          cb(null, {
+            name: user.name
+          });
+
+          connection.release(function (err) {
+            if (err) {
+              console.error(err.message);
+            }
+          });
+        });
+    }
+  );
+}
+
+function updateUser(user, cb) {
+  oracledb.getConnection(
+    config.database,
+    function (err, connection) {
+      if (err) {
+        return cb(err);
+      }
+
+      connection.execute(
+        'update jsao_users set role = :role, fullname = :fullname, email = :email, department = :department where name = :name', {
+          name: user.name.toLowerCase(),
+          role: user.role.toUpperCase(),
+          fullname: user.fullname,
+          email: user.email,
+          department: user.department,
         }, {
           autoCommit: true
         },

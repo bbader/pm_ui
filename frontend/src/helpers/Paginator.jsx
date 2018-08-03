@@ -1,6 +1,7 @@
+
 import React from 'react';
 import PropTypes from 'prop-types';
-import Pagify from 'react-pagify';
+import Pagify from 'react-pagify/dist-modules';
 import segmentize from 'segmentize';
 
 const Paginator = ({ pagination, pages, onSelect }) => (
